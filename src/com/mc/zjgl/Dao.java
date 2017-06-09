@@ -18,7 +18,7 @@ public class Dao {
 	 		   System.exit(0);
 	 	   }
 	 	   try{
-	 		   con=DriverManager.getConnection("jdbc:sqlserver://192.168.0.13:1433;DatabaseName=","sa","llfaicly1314@^");
+	 		   con=DriverManager.getConnection("jdbc:sqlserver://192.168.0.13:1433;DatabaseName=mczjgl","sa","llfaicly1314@^");
 	 	   }catch(SQLException e){
 	 		  JFrame j=new JFrame();
 	 		   j.setAlwaysOnTop(true);

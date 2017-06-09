@@ -2,8 +2,16 @@ package com.mc.zjgl;
 
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,6 +29,7 @@ import javax.swing.table.DefaultTableModel;
 public class ExpertManage {
 	JFrame mf;
 	BasicData bd=new BasicData();
+	ExpertData ed=new ExpertData();
 	public ExpertManage(String user){
 		mf=new JFrame();
 		mf.setTitle("ExpertManage");
@@ -59,6 +68,19 @@ public class ExpertManage {
 		p.add(expertGroup);
 		JButton addExpertGroup=new JButton("添加组别");
 		addExpertGroup.setBounds(85,125,90,25);
+		expertGroup.addKeyListener(new KeyAdapter(){
+			public void keyPressed(KeyEvent e){
+				if(e.getKeyCode()=='\n'){
+					addExpertGroup.doClick();
+				}
+			}
+		});
+		p.add(addExpertGroup);
+		JScrollPane expertGroupJSP=new JScrollPane();
+		String[] cn={"GroupID","专业组别"};
+		String[][] arr=bd.getGroup(mf);
+		JTable expertGroupTable=new JTable();
+		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
 		addExpertGroup.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -66,18 +88,17 @@ public class ExpertManage {
 				    String s=expertGroup.getText().trim();
 				    if(s.length()!=0){
 				    	new SQLFilter(mf,s,user);
-				    	bd.addGroup(mf, s);
+				    	int i=bd.addGroup(mf, s);
+				    	if(i==1){
+				    		JOptionPane.showMessageDialog(mf, "添加专业组别成功");
+				    	}
+				    	expertGroupTableModel.setDataVector(bd.getGroup(mf), cn);
+				    	expertGroup.setText("");
 				    }else{
 				    	JOptionPane.showMessageDialog(mf, "输入不能为空");
 				    }
 			}
 		});
-		p.add(addExpertGroup);
-		JScrollPane expertGroupJSP=new JScrollPane();
-		String[] cn={"GroupID","专业组别"};
-		String[][] arr={{"1","检查组"},{"2","执行组"}};
-		JTable expertGroupTable=new JTable();
-		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
 		tcr.setHorizontalAlignment(JLabel.CENTER);
 		expertGroupTable.setDefaultRenderer(Object.class, tcr);
@@ -94,7 +115,20 @@ public class ExpertManage {
 		expertGroup1.setBounds(300,90,200,25);
 		p.add(expertGroup1);
 		JButton addExpertGroup1=new JButton("添加专业");
+		expertGroup1.addKeyListener(new KeyAdapter(){
+			public void keyPressed(KeyEvent e){
+				if(e.getKeyCode()=='\n'){
+					addExpertGroup1.doClick();
+				}
+			}
+		});
 		addExpertGroup1.setBounds(355,125,90,25);
+		p.add(addExpertGroup1);
+		JScrollPane expertGroupJSP1=new JScrollPane();
+		String[] cn1={"ProfessionID","专业领域"};
+		String[][] arr1=bd.getProfessionnal(mf);
+		JTable expertGroupTable1=new JTable();
+		DefaultTableModel expertGroupTableModel1=new DefaultTableModel(arr1,cn1);
 		addExpertGroup1.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -102,18 +136,17 @@ public class ExpertManage {
 				    String s=expertGroup1.getText().trim();
 				    if(s.length()!=0){
 				    	new SQLFilter(mf,s,user);
-				    	bd.addGroup(mf, s);
+				    	int i=bd.addProfessional(mf, s);
+				    	if(i==1){
+				    		JOptionPane.showMessageDialog(mf, "添加专业组别成功");
+				    	}
+				    	expertGroupTableModel1.setDataVector(bd.getProfessionnal(mf), cn1);
+				    	expertGroup1.setText("");
 				    }else{
 				    	JOptionPane.showMessageDialog(mf, "输入不能为空");
 				    }
 			}
 		});
-		p.add(addExpertGroup1);
-		JScrollPane expertGroupJSP1=new JScrollPane();
-		String[] cn1={"ProfessionID","专业领域"};
-		String[][] arr1={{"1","专业1"},{"2","专业2"}};
-		JTable expertGroupTable1=new JTable();
-		DefaultTableModel expertGroupTableModel1=new DefaultTableModel(arr1,cn1);
 		expertGroupTable1.setDefaultRenderer(Object.class, tcr);
 		expertGroupTable1.setModel(expertGroupTableModel1);
 		expertGroupTable1.setRowHeight(22);
@@ -131,6 +164,11 @@ public class ExpertManage {
 		return p;
 	}
 	public JPanel manageExpert(){
+		String[][] professionalgroup=bd.getGroup(mf);
+		String[][] sex=bd.getSex(mf);
+		String[][] education=bd.getEducation(mf);
+		String[][] professional=bd.getProfessionnal(mf);
+		String[][] occupation=bd.getOccupation(mf);
 		JPanel p=new JPanel();
 		p.setLayout(null);
 		JLabel ptitle=new JLabel("添加专家信息",JLabel.CENTER);
@@ -140,49 +178,82 @@ public class ExpertManage {
 		p.add(ptitle);
 		JComboBox<String> chooseExpertGroup=new JComboBox<String>();
 		chooseExpertGroup.addItem("请选择专业组别");
+		int pgl=professionalgroup.length;
+		for(int i=0;i<pgl;i++){
+			chooseExpertGroup.addItem(professionalgroup[i][1]);
+		}
 		chooseExpertGroup.setBounds(30,60,120,25);
 		p.add(chooseExpertGroup);
 		JTextField expertNameT=new JTextField("请输入专家姓名");
+		expertNameT.addFocusListener(new MyFocusListener("请输入专家姓名", expertNameT));
 		expertNameT.setBounds(180,60,120,25);
 		p.add(expertNameT);
 		JComboBox<String> chooseExpertSex=new JComboBox<String>();
 		chooseExpertSex.addItem("请选择专业性别");
+		int sexl=sex.length;
+		for(int i=0;i<sexl;i++){
+			chooseExpertSex.addItem(sex[i][1]);
+		}
 		chooseExpertSex.setBounds(330,60,120,25);
 		p.add(chooseExpertSex);
 		JTextField expertBurnDate=new JTextField("请输入专家出生日期");
+		expertBurnDate.addFocusListener(new MyFocusListener("请输入专家出生日期", expertBurnDate));
 		expertBurnDate.setBounds(480,60,120,25);
 		p.add(expertBurnDate);
 		JComboBox<String> chooseExpertEducation=new JComboBox<String>();
 		chooseExpertEducation.addItem("请选择专业学历");
+		int educationl=education.length;
+		for(int i=0;i<educationl;i++){
+			chooseExpertEducation.addItem(education[i][1]);
+		}
 		chooseExpertEducation.setBounds(630,60,120,25);
 		p.add(chooseExpertEducation);
 		JTextField expertCompany=new JTextField("请输入专家工作单位");
+		expertCompany.addFocusListener(new MyFocusListener("请输入专家工作单位", expertCompany));
 		expertCompany.setBounds(780,60,120,25);
 		p.add(expertCompany);
 		JComboBox<String> chooseExpertProfession=new JComboBox<String>();
 		chooseExpertProfession.addItem("请选择专家专业");
+		int professionall=professional.length;
+		for(int i=0;i<professionall;i++){
+			chooseExpertProfession.addItem(professional[i][1]);
+		}
 		chooseExpertProfession.setBounds(930,60,120,25);
 		p.add(chooseExpertProfession);
 		JComboBox<String> chooseExpertPosition=new JComboBox<String>();
 		chooseExpertPosition.addItem("请选择专家职位");
+		int occupationl=occupation.length;
+		for(int i=0;i<occupationl;i++){
+			chooseExpertPosition.addItem(occupation[i][1]);
+		}
 		chooseExpertPosition.setBounds(30,100,120,25);
 		p.add(chooseExpertPosition);
 		JTextField expertTel=new JTextField("请输入联系电话");
+		expertTel.addFocusListener(new MyFocusListener("请输入联系电话", expertTel));
 		expertTel.setBounds(180,100,120,25);
 		p.add(expertTel);
 		JTextField expertAddress=new JTextField("请输入联系地址");
+		expertAddress.addFocusListener(new MyFocusListener("请输入联系地址", expertAddress));
 		expertAddress.setBounds(330,100,500,25);
 		p.add(expertAddress);
+		JComboBox<String> chooseExpertArea=new JComboBox<String>();
+		chooseExpertArea.addItem("请选择区域");
+		chooseExpertArea.addItem("市内");
+		chooseExpertArea.addItem("市外");
+		chooseExpertArea.setBounds(870,100,120,25);
+		p.add(chooseExpertArea);
 		JTextField expertMark=new JTextField("请输入备注");
+		expertMark.addFocusListener(new MyFocusListener("请输入备注", expertMark));
 		expertMark.setBounds(30,140,800,25);
 		p.add(expertMark);
 		JButton addExpert=new JButton("添加");
 		addExpert.setBounds(575,180,80,25);
 		p.add(addExpert);
 		JScrollPane expertGroupJSP=new JScrollPane();
-		String[] cn={"ID","专业组别","姓名","性别","出生年月","学历","工作单位","专业领域","职称/职位","联系电话","通讯地址","备注"};
-		String[][] arr={{"1","检查组","test1","男","1984-2-5","本科","明创","检查","技术员","0750-3320133","广东江门","周六休息"},{"2","执行组","test2","女","1987-6-5","本科","明创","检查","经理","0750-3320133","广东江门","周日休息"}};
+		String[] cn={"ID","专业组别","姓名","性别","出生年月","学历","工作单位","专业领域","职称/职位","联系电话","区域","通讯地址","备注"};
+		String[][] arr=ed.getExpert(mf);
 		JTable expertGroupTable=new JTable();
+		expertGroupTable.getTableHeader().setReorderingAllowed(false);
 		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
 		tcr.setHorizontalAlignment(JLabel.CENTER);
@@ -192,6 +263,60 @@ public class ExpertManage {
 		expertGroupJSP.setViewportView(expertGroupTable);
 		expertGroupJSP.setBounds(30,220,1160,500);
 		p.add(expertGroupJSP);
+		addExpert.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				int cg=chooseExpertGroup.getSelectedIndex();
+				int ent=expertNameT.getText().trim().length();
+				int ces=chooseExpertSex.getSelectedIndex();
+				int ebd=expertBurnDate.getText().trim().length();
+				int cee=chooseExpertEducation.getSelectedIndex();
+				int ec=expertCompany.getText().trim().length();
+				int cepr=chooseExpertProfession.getSelectedIndex();
+				int cepo=chooseExpertPosition.getSelectedIndex();
+				int et=expertTel.getText().trim().length();
+				int ea=expertAddress.getText().trim().length();
+				int cea=chooseExpertArea.getSelectedIndex();
+				if(cg!=0&&ent!=0&&ces!=0&&ebd!=0&&cee!=0&&ec!=0&&cepr!=0&&cepo!=0&&et!=0&&ea!=0&&cea!=0){
+					if(expertNameT.getText().trim().equals("请输入专家姓名")||expertBurnDate.getText().trim().equals("请输入专家出生日期")
+					||expertCompany.getText().trim().equals("请输入专家工作单位")||expertTel.getText().trim().equals("请输入联系电话")
+					||expertAddress.getText().trim().equals("请输入联系地址")){
+						JOptionPane.showMessageDialog(mf, "录入信息不完整");
+					}else{
+						try{
+							String birthday=expertBurnDate.getText().trim();
+							SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");//小写的mm表示的是分钟  
+							String dstr=birthday;  
+							@SuppressWarnings("unused")
+							java.util.Date date=sdf.parse(dstr); 
+							System.out.println(birthday);
+							String mark="";
+							if(expertMark.getText().trim().equals("请输入备注")!=true){
+								mark=expertMark.getText().trim();
+							}
+							ed.insertExpert(mf,professionalgroup[cg-1][0], expertNameT.getText().trim(), chooseExpertSex.getSelectedItem().toString(),
+									birthday,chooseExpertEducation.getSelectedItem().toString(),
+									expertCompany.getText().trim(),professional[cepr-1][0], occupation[cepo-1][0],
+									expertTel.getText().trim(), chooseExpertArea.getSelectedItem().toString(),
+									expertAddress.getText().trim(), mark);
+							expertGroupTableModel.setDataVector(ed.getExpert(mf), cn);
+						}catch(Exception e1){
+							StringWriter sw = new StringWriter();
+						    PrintWriter pw = new PrintWriter(sw, true);
+						    e1.printStackTrace(pw);
+						    String mn = new Exception().getStackTrace()[0].getMethodName();// 获得当前的方法名 
+						    String dn = new Exception().getStackTrace()[1].getClassName();// 获得调用类
+							String errorString="错误类："+this.getClass().getName()+"\n错误方法："+mn+"\n调用类："+dn+"\n错误信息：\n"+sw.toString();
+							Rectangle b = mf.getBounds();
+							new ErrorDialog(mf, b, errorString);
+						}
+					}
+				}else{
+					JOptionPane.showMessageDialog(mf, "录入信息不完整");
+				}
+			}
+		});
 		return p;
 	}
 	public JPanel registerProject(){
@@ -308,4 +433,27 @@ public class ExpertManage {
 		p.add(projectMarkT);
 		return p;
 	}
+	
+}
+class MyFocusListener implements FocusListener {
+    String info;
+    JTextField jtf;
+    public MyFocusListener(String info, JTextField jtf) {
+        this.info = info;
+        this.jtf = jtf;
+    }
+    @Override
+    public void focusGained(FocusEvent e) {//获得焦点的时候,清空提示文字
+        String temp = jtf.getText();
+        if(temp.equals(info)){
+            jtf.setText("");
+        }
+    }
+    @Override
+    public void focusLost(FocusEvent e) {//失去焦点的时候,判断如果为空,就显示提示文字
+        String temp = jtf.getText();
+        if(temp.equals("")){
+            jtf.setText(info);
+        }
+    }
 }
