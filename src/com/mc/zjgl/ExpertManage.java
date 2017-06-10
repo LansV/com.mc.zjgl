@@ -1,7 +1,10 @@
 package com.mc.zjgl;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,11 +12,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -253,6 +259,19 @@ public class ExpertManage {
 		String[] cn={"ID","专业组别","姓名","性别","出生年月","学历","工作单位","专业领域","职称/职位","联系电话","区域","通讯地址","备注"};
 		String[][] arr=ed.getExpert(mf);
 		JTable expertGroupTable=new JTable();
+		expertGroupTable.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO 自动生成的方法存根
+				if(e.getButton()==3){
+					int sr=expertGroupTable.rowAtPoint(e.getPoint());
+					expertGroupTable.setRowSelectionInterval(sr, sr);
+					String pg=expertGroupTable.getValueAt(sr, 1).toString().trim();
+					String name=expertGroupTable.getValueAt(sr, 2).toString().trim();
+					new CheckBoxFrame(mf,professionalgroup,pg,name,e.getX(),e.getY());
+				}
+			}
+		});
 		expertGroupTable.getTableHeader().setReorderingAllowed(false);
 		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
@@ -434,6 +453,57 @@ public class ExpertManage {
 		return p;
 	}
 	
+}
+class CheckBoxFrame extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3153430997940131717L;
+	public CheckBoxFrame(){
+		//default
+	}
+	public CheckBoxFrame(JFrame f,String[][] ls,String pg,String name,int x,int y){
+		int lss=ls.length;
+		this.setTitle("修改"+name+"组别");
+		this.setResizable(false);
+		Container c = this.getContentPane();
+		c.setLayout(new BorderLayout());
+		JPanel tp=new JPanel();
+		tp.setLayout(new GridLayout(0, 2));
+		JCheckBox[] boxs = new JCheckBox[lss];
+		for(int i=0;i<lss;i++){
+			boxs[i]=new JCheckBox(ls[i][0]+":"+ls[i][1]);
+			if(ls[i][1].equals(pg)){
+				boxs[i].setSelected(true);
+			}
+			tp.add(boxs[i]);
+		}
+		c.add(tp);
+		JPanel bp=new JPanel();
+		bp.setLayout(new FlowLayout());
+		JButton b=new JButton("修改");
+		b.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				int count=0;
+				for(int i=0;i<lss;i++){
+					if(boxs[i].isSelected()){
+						count++;
+						System.out.println(boxs[i].getText());
+					}
+				}
+				if(count==0){
+					JOptionPane.showMessageDialog(c, "请至少选择一项");
+					return;
+				}
+			}
+		});
+		bp.add(b);
+		c.add("South",bp);
+		this.setBounds(x+50,y+320,300,80+20*lss);
+		this.setVisible(true);
+	}
 }
 class MyFocusListener implements FocusListener {
     String info;
