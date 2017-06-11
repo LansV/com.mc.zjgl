@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -471,6 +472,7 @@ class CheckBoxFrame extends JFrame{
 		JPanel tp=new JPanel();
 		tp.setLayout(new GridLayout(0, 2));
 		JCheckBox[] boxs = new JCheckBox[lss];
+		ArrayList<Integer> oldSelect = new ArrayList<Integer>();
 		for(int i=0;i<lss;i++){
 			boxs[i]=new JCheckBox(ls[i][0]+":"+ls[i][1]);
 			String[] st=pg.split(",");
@@ -479,6 +481,7 @@ class CheckBoxFrame extends JFrame{
 				if(ls[i][1].equals(st[j])){
 					System.out.println(st[j]);
 					boxs[i].setSelected(true);
+					oldSelect.add(i);
 				}
 			}
 			tp.add(boxs[i]);
@@ -492,17 +495,34 @@ class CheckBoxFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				int count=0;
+				int osl=oldSelect.size();
+				int countold=0;
 				for(int i=0;i<lss;i++){
 					if(boxs[i].isSelected()){
 						count++;
-						System.out.println(ls[i][0]);
-						System.out.println(boxs[i].getText());
+						for(int j=0;j<osl;j++){
+							if(oldSelect.get(j)==i){
+								countold++;
+							}else{
+								System.out.println("add:"+ls[i][0]);
+							}
+						}
+						//System.out.println(ls[i][0]);
+						//System.out.println(boxs[i].getText());
+					}else{
+						if(count==0){
+							JOptionPane.showMessageDialog(c, "请至少选择一项");
+							return;
+						}
+						for(int j=0;j<osl;j++){
+							if(oldSelect.get(j)==i){
+								System.out.println("delete:"+ls[i][0]);
+							}
+						}
 					}
 				}
-				if(count==0){
-					JOptionPane.showMessageDialog(c, "请至少选择一项");
-					return;
-				}
+				
+				System.out.println(countold);
 			}
 		});
 		bp.add(b);
