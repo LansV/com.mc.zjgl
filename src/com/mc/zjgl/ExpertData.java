@@ -36,8 +36,9 @@ public class ExpertData {
 					}
 					id=Integer.toString(maxid);
 				}
-				String sqlstr="insert into expert values ("+id+","+pgid+",'"+en+"','"+es+"','"+ebd+"','"+educ+"','"+ec+"',"
-						+ ""+prof+","+occup+",'"+tel+"','"+area+"','"+address+"','"+mark+"')";
+				String sqlstr="insert into expert values ("+id+",'"+en+"','"+es+"','"+ebd+"','"+educ+"','"+ec+"',"
+						+ ""+prof+","+occup+",'"+tel+"','"+area+"','"+address+"','"+mark+"');"
+								+ "insert into expertgroup values("+id+","+pgid+")";
 				System.out.println(sqlstr);
 				sql.execute(sqlstr);
 				i=1;
@@ -62,10 +63,30 @@ public class ExpertData {
 		ArrayList<String> ls = new ArrayList<String>();
 		try {
 			sql=con.createStatement();
-			res=sql.executeQuery("select * from expert "
-					+ "inner join professionalgroup on expert.professionalgroup=professionalgroup.professionalgroupid "
-					+ "inner join professional on expert.professional=professional.professionalid "
-					+ "inner join occupation on expert.occupation=occupation.occupationid order by expertid");
+			res=sql.executeQuery("select expertid,professionalgroupname=("
+					+ "stuff("
+					+ "("
+					+ "select ','+professionalgroupname  from ("
+					+ " select expert.expertid,professionalgroupname from "
+					+ " expert"
+					+ " inner join expertgroup on expert.expertid=expertgroup.expertid"
+					+ " inner join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid"
+					+ ") b"
+					+ " WHERE expertid = A.expertid for xml path('')),1,1,'')"
+					+ "),MAX(expertname) as expertname ,MAX(expertsex) as expertsex,MAX(expertburndate) as expertburndate,"
+					+ "max(education) as education,MAX(expertcompany) as expertcompany,MAX(professionalname) as professionalname,"
+					+ "MAX(occupationname) as occupationname,MAX(tel) as tel,MAX(area) as area,MAX(address) as address,"
+					+ "MAX(mark) as  mark"
+					+ " from "
+					+ "("
+					+ "select expert.expertid,professionalgroupname,expertname,expertsex,expertburndate,education,"
+					+ "expertcompany,professionalname,occupationname,tel,area,address,mark from "
+					+ " expert"
+					+ " inner join expertgroup on expert.expertid=expertgroup.expertid"
+					+ " inner join professional on expert.professional=professional.professionalid"
+					+ " inner join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid"
+					+ " inner join occupation on expert.occupation=occupation.occupationid"
+					+ " ) A group by expertid");
 			while(res.next()){
 				ls.add(res.getString("expertid"));
 				ls.add(res.getString("professionalgroupname"));

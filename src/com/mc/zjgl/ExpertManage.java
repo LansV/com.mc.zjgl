@@ -473,8 +473,13 @@ class CheckBoxFrame extends JFrame{
 		JCheckBox[] boxs = new JCheckBox[lss];
 		for(int i=0;i<lss;i++){
 			boxs[i]=new JCheckBox(ls[i][0]+":"+ls[i][1]);
-			if(ls[i][1].equals(pg)){
-				boxs[i].setSelected(true);
+			String[] st=pg.split(",");
+			int stl=st.length;
+			for(int j=0;j<stl;j++){
+				if(ls[i][1].equals(st[j])){
+					System.out.println(st[j]);
+					boxs[i].setSelected(true);
+				}
 			}
 			tp.add(boxs[i]);
 		}
@@ -490,6 +495,7 @@ class CheckBoxFrame extends JFrame{
 				for(int i=0;i<lss;i++){
 					if(boxs[i].isSelected()){
 						count++;
+						System.out.println(ls[i][0]);
 						System.out.println(boxs[i].getText());
 					}
 				}
