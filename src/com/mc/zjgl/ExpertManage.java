@@ -24,8 +24,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -260,6 +262,23 @@ public class ExpertManage {
 		String[] cn={"ID","专业组别","姓名","性别","出生年月","学历","工作单位","专业领域","职称/职位","联系电话","区域","通讯地址","备注"};
 		String[][] arr=ed.getExpert(mf);
 		JTable expertGroupTable=new JTable();
+		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
+		JPopupMenu editRight=new JPopupMenu();
+		JMenuItem edit=new JMenuItem("编辑");
+		JMenuItem delete=new JMenuItem("删除");
+		edit.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				int sr=expertGroupTable.getSelectedRow();
+				String expertid=expertGroupTable.getValueAt(sr, 0).toString().trim();
+				String pg=expertGroupTable.getValueAt(sr, 1).toString().trim();
+				String name=expertGroupTable.getValueAt(sr, 2).toString().trim();
+				new CheckBoxFrame(mf,professionalgroup,expertGroupTableModel,cn,expertid,pg,name,expertGroupTable.getX(),expertGroupTable.getY());
+			}
+		});
+		editRight.add(edit);
+		editRight.add(delete);
 		expertGroupTable.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -267,14 +286,11 @@ public class ExpertManage {
 				if(e.getButton()==3){
 					int sr=expertGroupTable.rowAtPoint(e.getPoint());
 					expertGroupTable.setRowSelectionInterval(sr, sr);
-					String pg=expertGroupTable.getValueAt(sr, 1).toString().trim();
-					String name=expertGroupTable.getValueAt(sr, 2).toString().trim();
-					new CheckBoxFrame(mf,professionalgroup,pg,name,e.getX(),e.getY());
+					editRight.show(expertGroupTable, e.getX(), e.getY());
 				}
 			}
 		});
 		expertGroupTable.getTableHeader().setReorderingAllowed(false);
-		DefaultTableModel expertGroupTableModel=new DefaultTableModel(arr,cn);
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
 		tcr.setHorizontalAlignment(JLabel.CENTER);
 		expertGroupTable.setDefaultRenderer(Object.class, tcr);
@@ -460,12 +476,14 @@ class CheckBoxFrame extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = -3153430997940131717L;
+	ExpertData ed=new ExpertData();
 	public CheckBoxFrame(){
 		//default
 	}
-	public CheckBoxFrame(JFrame f,String[][] ls,String pg,String name,int x,int y){
+	public CheckBoxFrame(JFrame f,String[][] ls,DefaultTableModel dm,String[] cn,String expertid,String pg,String name,int x,int y){
 		int lss=ls.length;
 		this.setTitle("修改"+name+"组别");
+		JFrame ft=this;
 		this.setResizable(false);
 		Container c = this.getContentPane();
 		c.setLayout(new BorderLayout());
@@ -496,38 +514,49 @@ class CheckBoxFrame extends JFrame{
 				// TODO 自动生成的方法存根
 				int count=0;
 				int osl=oldSelect.size();
-				int countold=0;
+				String str="";
 				for(int i=0;i<lss;i++){
 					if(boxs[i].isSelected()){
 						count++;
-						for(int j=0;j<osl;j++){
-							if(oldSelect.get(j)==i){
-								countold++;
-							}else{
-								System.out.println("add:"+ls[i][0]);
+						if(osl!=0){
+							for(int j=0;j<osl;j++){
+								if(oldSelect.get(j)==i){
+									oldSelect.remove(j);
+									osl=oldSelect.size();
+									break;
+								}else{
+									str=str+"insert into expertgroup values("+expertid+","+ls[i][0]+");";
+								}
 							}
+						}else{
+							str=str+"insert into expertgroup values("+expertid+","+ls[i][0]+");";
 						}
-						//System.out.println(ls[i][0]);
-						//System.out.println(boxs[i].getText());
 					}else{
-						if(count==0){
-							JOptionPane.showMessageDialog(c, "请至少选择一项");
-							return;
-						}
 						for(int j=0;j<osl;j++){
 							if(oldSelect.get(j)==i){
-								System.out.println("delete:"+ls[i][0]);
+								oldSelect.remove(j);
+								osl=oldSelect.size();
+								str=str+"delete expertgroup where expertid="+expertid+" and professionalgroup = "+ls[i][0]+";";
+								break;
 							}
 						}
 					}
 				}
-				
-				System.out.println(countold);
+				if(count==0){
+					JOptionPane.showMessageDialog(c, "请至少选择一项");
+					ft.dispose();
+					new CheckBoxFrame(f,ls,dm,cn,expertid,pg,name,x,y);
+				}else{
+					ed.editProfessionalGroup(f, str);
+					JOptionPane.showMessageDialog(ft, "修改完成");
+					dm.setDataVector(ed.getExpert(f), cn);
+					ft.dispose();
+				}
 			}
 		});
 		bp.add(b);
 		c.add("South",bp);
-		this.setBounds(x+50,y+320,300,80+20*lss);
+		this.setBounds(x+50,y+350,300,80+20*lss);
 		this.setVisible(true);
 	}
 }
