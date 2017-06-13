@@ -145,4 +145,22 @@ public class ExpertData {
 		}
 		return i;
 	}
+	public int deleteExpert(JFrame f,String s){
+		int i=0;
+		try {
+			sql=con.createStatement();
+			sql.execute("delete expert where expertid="+s+";delete expertgroup where expertid="+s+";");
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
+			StringWriter sw = new StringWriter();
+		    PrintWriter pw = new PrintWriter(sw, true);
+		    e.printStackTrace(pw);
+		    String mn = new Exception().getStackTrace()[0].getMethodName();// 获得当前的方法名 
+		    String dn = new Exception().getStackTrace()[1].getClassName();// 获得调用类
+			String errorString="错误类："+this.getClass().getName()+"\n错误方法："+mn+"\n调用类："+dn+"\n错误信息：\n"+sw.toString();
+			Rectangle b = f.getBounds();
+			new ErrorDialog(f, b, errorString);
+		}
+		return i;
+	}
 }
