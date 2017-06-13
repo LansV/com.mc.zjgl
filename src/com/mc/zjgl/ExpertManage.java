@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -18,7 +20,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -35,6 +36,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -478,6 +481,7 @@ public class ExpertManage {
 		projectTraficT.setBounds(150, 413, 880, 25);
 		p.add(projectTraficT);
 		// ---------------------------------------------------------------
+		ArrayList<String> comboboxselect = new ArrayList<String>();
 		String[][] pgarr=rnd.getProfessionalgroup(mf);
 		int pgarrl=pgarr.length;
 		JScrollPane expertGroupJSP = new JScrollPane();
@@ -497,29 +501,71 @@ public class ExpertManage {
 
 			public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 				Double num;
-				if (aValue.equals("请选择专业组别")) {
-					return;
+				if(columnIndex == 0){
+					if (aValue.equals("请选择专业组别")) {
+						return;
+					}
+					int cs=comboboxselect.size();
+					for(int i=0;i<cs;i++){
+						if(aValue.equals(comboboxselect.get(i))){
+							JOptionPane.showMessageDialog(mf, aValue+"已选择");
+							return;
+						}
+					}
+					if(rowIndex==0&&cs!=0){
+						comboboxselect.remove(0);
+						comboboxselect.add(0, aValue.toString());
+					}else{
+						comboboxselect.add(aValue.toString());
+					}
+					
 				}
 				if (columnIndex == 1) {
-					try {
-						String st = (String) aValue;
-						if (st.length() != 0) {
-							num = Double.parseDouble(st);
-							if (num < 0) {
-								JOptionPane.showMessageDialog(null, "请勿输入负数");
-								return;
-							} else {
-								super.setValueAt(aValue, rowIndex, columnIndex);
+					String s=this.getValueAt(rowIndex, 0).toString();
+					if(s.length()!=0){
+						try {
+							String st = (String) aValue;
+							if (st.length() != 0) {
+								num = Double.parseDouble(st);
+								if (num < 0) {
+									JOptionPane.showMessageDialog(null, "请勿输入负数");
+									return;
+								} else {
+									super.setValueAt(aValue, rowIndex, columnIndex);
+								}
 							}
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(null, "只能输入数字!");
+							return;
 						}
-					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, "只能输入数字!");
+					}else{
+						JOptionPane.showMessageDialog(this, "请先选择组别");
 						return;
 					}
 				}
 				super.setValueAt(aValue, rowIndex, columnIndex);
 			}
+			public void processKeyEvent(KeyEvent e){
+				 if(this.getEditorComponent() == null && 
+				 e.getKeyCode() != KeyEvent.VK_UP && 
+				 e.getKeyCode() != KeyEvent.VK_DOWN&&e.getKeyCode()!=KeyEvent.VK_RIGHT&&e.getKeyCode()!=KeyEvent.VK_LEFT&&
+				 e.getKeyCode()!=KeyEvent.VK_TAB&& e.getKeyCode()!=KeyEvent.VK_ENTER) 
+				return;
+				else
+				super.processKeyEvent(e);
+				}
 		};
+		pg.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange()==ItemEvent.SELECTED){
+					String s=pg.getSelectedItem().toString();
+					System.out.println(s);
+				}
+			}
+			
+		});
 		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn) {
 			/**
 			 * 
@@ -532,27 +578,53 @@ public class ExpertManage {
 					return true;
 				}
 				if (r < i && c == 0) {
-					expertGroupTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(pg));
 					return true;
 				}
 				return false;
 			}
 		};
+		expertGroupTableModel.addTableModelListener(new TableModelListener(){
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				// TODO Auto-generated method stub
+				int i=expertGroupTable.getRowCount()-1;
+				int ta=0;
+				if(e.getColumn()==1&&e.getFirstRow()!=i){
+					for(int j=0;j<i;j++){
+						String s=expertGroupTable.getValueAt(j, 1).toString();
+						if(s.length()!=0){
+							int t=Integer.parseInt(s);
+							ta=ta+t;
+						}
+					}
+					expertGroupTable.setValueAt(Integer.toString(ta), i, 1);
+				}
+			}
+		});
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
 		tcr.setHorizontalAlignment(JLabel.CENTER);
 		expertGroupTable.setDefaultRenderer(Object.class, tcr);
 		expertGroupTable.setModel(expertGroupTableModel);
+		expertGroupTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(pg));
 		expertGroupTable.setRowHeight(22);
 		expertGroupJSP.setViewportView(expertGroupTable);
 		expertGroupJSP.setBounds(80, 455, 980, 90);
-		Vector<String> row = new Vector<String>();
+		Object[] row = new Object[2];
+		row[0] = "";
+		row[1] = "";
 		expertGroupTable.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO 自动生成的方法存根
 				int r = expertGroupTable.getRowCount();
 				if (e.getKeyCode() == '\n') {
-					expertGroupTableModel.insertRow(r - 1, row);
+					String s=expertGroupTableModel.getValueAt(r-2,1).toString();
+					System.out.println(s);
+					if(s.length()!=0){
+						expertGroupTableModel.insertRow(r - 1, row);
+					}else{
+						JOptionPane.showMessageDialog(mf, "上一行未填写完成");
+					}
 				}
 			}
 		});
