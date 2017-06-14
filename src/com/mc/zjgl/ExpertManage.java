@@ -498,7 +498,6 @@ public class ExpertManage {
 			 * 
 			 */
 			private static final long serialVersionUID = 5683615638208058553L;
-
 			public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 				Double num;
 				if(columnIndex == 0){
@@ -527,15 +526,15 @@ public class ExpertManage {
 							String st = (String) aValue;
 							if (st.length() != 0) {
 								num = Double.parseDouble(st);
-								if (num < 0) {
-									JOptionPane.showMessageDialog(null, "请勿输入负数");
+								if (num <= 0) {
+									JOptionPane.showMessageDialog(mf, "请勿输入负数或零");
 									return;
 								} else {
 									super.setValueAt(aValue, rowIndex, columnIndex);
 								}
 							}
 						} catch (Exception ex) {
-							JOptionPane.showMessageDialog(null, "只能输入数字!");
+							JOptionPane.showMessageDialog(mf, "只能输入数字!");
 							return;
 						}
 					}else{
@@ -675,6 +674,9 @@ public class ExpertManage {
 				String pjAvoid = avoidC.getSelectedItem().toString().trim();
 				String pjView = projectViewT.getText().trim();
 				String pjMark = projectMarkT.getText().trim();
+				if(expertGroupTable.isEditing()){
+					expertGroupTable.getCellEditor().stopCellEditing();
+				}
 				if (pjId.length() != 0 && pjNeed.length() != 0 && pjNeedDate.length() != 0 && pjName.length() != 0
 						&& pjNeedDay.length() != 0 && pjContact.length() != 0
 						&& chooseExpertPosition.getSelectedIndex() != 0 && pjTel.length() != 0
@@ -688,12 +690,27 @@ public class ExpertManage {
 							String s = expertGroupTable.getValueAt(expertGroupTable.getRowCount() - 1, 1).toString();
 							int cp = Integer.parseInt(s);
 							if (cp > 0) {
+								
 								System.out.println(cp);
 								String str = "insert into projectregister values(" + pjId + ",'" + pjNeed + "','"
 										+ pjNeedDate + "','" + pjName + "'," + pjNeedDay + ",'" + pjContact + "'," + "'"
 										+ pjOccupation + "','" + pjTel + "','" + pjMeetPlace + "','" + pjMeetDate
 										+ "','" + pjWork + "','" + pjTraffic + "','" + pjAvoid + "'," + "'" + pjView
-										+ "','" + pjMark + "',0)";
+										+ "','" + pjMark + "',0);";
+								int rowc=expertGroupTable.getRowCount()-1;
+								String str2="";
+								for(int t=0;t<rowc;t++){
+									String f=expertGroupTable.getValueAt(t, 0).toString();
+									String se=expertGroupTable.getValueAt(t, 1).toString();
+									String id="";
+									for(int tt=0;tt<pgarrl;tt++){
+										if(f.equals(pgarr[tt][1])){
+											id=pgarr[tt][0];
+										}
+									}
+									str2=str2+"insert into expertneed values("+pjId+","+id+","+se+");";
+								}
+								str=str+str2;
 								int i = rnd.insertProjectRegister(mf, str);
 								if (i == 1) {
 									JOptionPane.showMessageDialog(mf, "登记成功");
