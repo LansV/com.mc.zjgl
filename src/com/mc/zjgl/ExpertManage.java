@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -482,14 +481,14 @@ public class ExpertManage {
 		p.add(projectTraficT);
 		// ---------------------------------------------------------------
 		ArrayList<String> comboboxselect = new ArrayList<String>();
-		String[][] pgarr=rnd.getProfessionalgroup(mf);
-		int pgarrl=pgarr.length;
+		String[][] pgarr = rnd.getProfessionalgroup(mf);
+		int pgarrl = pgarr.length;
 		JScrollPane expertGroupJSP = new JScrollPane();
 		String[] cn = { "需求专业类型", "需求人数" };
 		String[][] arr = { { "", "" }, { "合计（单位:人）", "0" } };
 		JComboBox<String> pg = new JComboBox<String>();
 		pg.addItem("请选择专业组别");
-		for(int i=0;i<pgarrl;i++){
+		for (int i = 0; i < pgarrl; i++) {
 			pg.addItem(pgarr[i][1]);
 		}
 		JTable expertGroupTable = new JTable() {
@@ -498,30 +497,31 @@ public class ExpertManage {
 			 * 
 			 */
 			private static final long serialVersionUID = 5683615638208058553L;
+
 			public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 				Double num;
-				if(columnIndex == 0){
+				if (columnIndex == 0) {
 					if (aValue.equals("请选择专业组别")) {
 						return;
 					}
-					int cs=comboboxselect.size();
-					for(int i=0;i<cs;i++){
-						if(aValue.equals(comboboxselect.get(i))){
-							JOptionPane.showMessageDialog(mf, aValue+"已选择");
+					int cs = comboboxselect.size();
+					for (int i = 0; i < cs; i++) {
+						if (aValue.equals(comboboxselect.get(i))) {
+							JOptionPane.showMessageDialog(mf, aValue + "已选择");
 							return;
 						}
 					}
-					if(rowIndex==0&&cs!=0){
+					if (rowIndex == 0 && cs != 0) {
 						comboboxselect.remove(0);
 						comboboxselect.add(0, aValue.toString());
-					}else{
+					} else {
 						comboboxselect.add(aValue.toString());
 					}
-					
+
 				}
 				if (columnIndex == 1) {
-					String s=this.getValueAt(rowIndex, 0).toString();
-					if(s.length()!=0){
+					String s = this.getValueAt(rowIndex, 0).toString();
+					if (s.length() != 0) {
 						try {
 							String st = (String) aValue;
 							if (st.length() != 0) {
@@ -537,33 +537,34 @@ public class ExpertManage {
 							JOptionPane.showMessageDialog(mf, "只能输入数字!");
 							return;
 						}
-					}else{
+					} else {
 						JOptionPane.showMessageDialog(this, "请先选择组别");
 						return;
 					}
 				}
 				super.setValueAt(aValue, rowIndex, columnIndex);
 			}
-			public void processKeyEvent(KeyEvent e){
-				 if(this.getEditorComponent() == null && 
-				 e.getKeyCode() != KeyEvent.VK_UP && 
-				 e.getKeyCode() != KeyEvent.VK_DOWN&&e.getKeyCode()!=KeyEvent.VK_RIGHT&&e.getKeyCode()!=KeyEvent.VK_LEFT&&
-				 e.getKeyCode()!=KeyEvent.VK_TAB&& e.getKeyCode()!=KeyEvent.VK_ENTER) 
-				return;
+
+			public void processKeyEvent(KeyEvent e) {
+				if (this.getEditorComponent() == null && e.getKeyCode() != KeyEvent.VK_UP
+						&& e.getKeyCode() != KeyEvent.VK_DOWN && e.getKeyCode() != KeyEvent.VK_RIGHT
+						&& e.getKeyCode() != KeyEvent.VK_LEFT && e.getKeyCode() != KeyEvent.VK_TAB
+						&& e.getKeyCode() != KeyEvent.VK_ENTER)
+					return;
 				else
-				super.processKeyEvent(e);
-				}
+					super.processKeyEvent(e);
+			}
 		};
-		pg.addItemListener(new ItemListener(){
+		pg.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				// TODO Auto-generated method stub
-				if(e.getStateChange()==ItemEvent.SELECTED){
-					String s=pg.getSelectedItem().toString();
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					String s = pg.getSelectedItem().toString();
 					System.out.println(s);
 				}
 			}
-			
+
 		});
 		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn) {
 			/**
@@ -582,18 +583,18 @@ public class ExpertManage {
 				return false;
 			}
 		};
-		expertGroupTableModel.addTableModelListener(new TableModelListener(){
+		expertGroupTableModel.addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent e) {
 				// TODO Auto-generated method stub
-				int i=expertGroupTable.getRowCount()-1;
-				int ta=0;
-				if(e.getColumn()==1&&e.getFirstRow()!=i){
-					for(int j=0;j<i;j++){
-						String s=expertGroupTable.getValueAt(j, 1).toString();
-						if(s.length()!=0){
-							int t=Integer.parseInt(s);
-							ta=ta+t;
+				int i = expertGroupTable.getRowCount() - 1;
+				int ta = 0;
+				if (e.getColumn() == 1 && e.getFirstRow() != i) {
+					for (int j = 0; j < i; j++) {
+						String s = expertGroupTable.getValueAt(j, 1).toString();
+						if (s.length() != 0) {
+							int t = Integer.parseInt(s);
+							ta = ta + t;
 						}
 					}
 					expertGroupTable.setValueAt(Integer.toString(ta), i, 1);
@@ -617,11 +618,11 @@ public class ExpertManage {
 				// TODO 自动生成的方法存根
 				int r = expertGroupTable.getRowCount();
 				if (e.getKeyCode() == '\n') {
-					String s=expertGroupTableModel.getValueAt(r-2,1).toString();
+					String s = expertGroupTableModel.getValueAt(r - 2, 1).toString();
 					System.out.println(s);
-					if(s.length()!=0){
+					if (s.length() != 0) {
 						expertGroupTableModel.insertRow(r - 1, row);
-					}else{
+					} else {
 						JOptionPane.showMessageDialog(mf, "上一行未填写完成");
 					}
 				}
@@ -674,7 +675,7 @@ public class ExpertManage {
 				String pjAvoid = avoidC.getSelectedItem().toString().trim();
 				String pjView = projectViewT.getText().trim();
 				String pjMark = projectMarkT.getText().trim();
-				if(expertGroupTable.isEditing()){
+				if (expertGroupTable.isEditing()) {
 					expertGroupTable.getCellEditor().stopCellEditing();
 				}
 				if (pjId.length() != 0 && pjNeed.length() != 0 && pjNeedDate.length() != 0 && pjName.length() != 0
@@ -690,27 +691,27 @@ public class ExpertManage {
 							String s = expertGroupTable.getValueAt(expertGroupTable.getRowCount() - 1, 1).toString();
 							int cp = Integer.parseInt(s);
 							if (cp > 0) {
-								
 								System.out.println(cp);
 								String str = "insert into projectregister values(" + pjId + ",'" + pjNeed + "','"
 										+ pjNeedDate + "','" + pjName + "'," + pjNeedDay + ",'" + pjContact + "'," + "'"
 										+ pjOccupation + "','" + pjTel + "','" + pjMeetPlace + "','" + pjMeetDate
 										+ "','" + pjWork + "','" + pjTraffic + "','" + pjAvoid + "'," + "'" + pjView
 										+ "','" + pjMark + "',0);";
-								int rowc=expertGroupTable.getRowCount()-1;
-								String str2="";
-								for(int t=0;t<rowc;t++){
-									String f=expertGroupTable.getValueAt(t, 0).toString();
-									String se=expertGroupTable.getValueAt(t, 1).toString();
-									String id="";
-									for(int tt=0;tt<pgarrl;tt++){
-										if(f.equals(pgarr[tt][1])){
-											id=pgarr[tt][0];
+								int rowc = expertGroupTable.getRowCount() - 1;
+								String str2 = "";
+								for (int t = 0; t < rowc; t++) {
+									String f = expertGroupTable.getValueAt(t, 0).toString();
+									String se = expertGroupTable.getValueAt(t, 1).toString();
+									String id = "";
+									for (int tt = 0; tt < pgarrl; tt++) {
+										if (f.equals(pgarr[tt][1])) {
+											id = pgarr[tt][0];
 										}
 									}
-									str2=str2+"insert into expertneed values("+pjId+","+id+","+se+");";
+									str2 = str2 + "insert into expertneed values(" + pjId + "," + id + "," + se
+											+ ",0);";
 								}
-								str=str+str2;
+								str = str + str2;
 								int i = rnd.insertProjectRegister(mf, str);
 								if (i == 1) {
 									JOptionPane.showMessageDialog(mf, "登记成功");
@@ -733,6 +734,11 @@ public class ExpertManage {
 		p.add(register);
 		return p;
 	}
+	public JPanel allProject(){
+		JPanel p=new JPanel();
+		return p;
+	}
+	
 }
 
 class CheckBoxFrame extends JFrame {
