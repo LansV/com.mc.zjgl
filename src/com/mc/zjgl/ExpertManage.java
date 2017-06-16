@@ -52,13 +52,12 @@ public class ExpertManage {
 		mf.setBounds(10, 10, 1230, 796);
 		mf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container mfc = mf.getContentPane();
-		JPanel pane = new JPanel();
 		JPanel pane1 = new JPanel();
 		JTabbedPane MTPane = new JTabbedPane();
 		MTPane.add("基础信息", basicInfo(user));
 		MTPane.add("管理专家", manageExpert());
 		MTPane.add("专家需求", registerProject());
-		MTPane.add("抽选结果", pane);
+		MTPane.add("抽选结果", allProject());
 		MTPane.add("系统设置", pane1);
 		mfc.add(MTPane);
 		mf.setVisible(true);
@@ -735,7 +734,42 @@ public class ExpertManage {
 		return p;
 	}
 	public JPanel allProject(){
+		AllProjectData apd=new AllProjectData();
 		JPanel p=new JPanel();
+		p.setLayout(new GridLayout(1,2,5,5));
+		JPanel lp=new JPanel();
+		lp.setLayout(new BorderLayout());
+		JPanel rp=new JPanel();
+		JLabel unlabel=new JLabel("未安排项目",JLabel.CENTER);
+		unlabel.setFont(new Font("宋体",1, 20));
+		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
+		tcr.setHorizontalAlignment(JLabel.CENTER);
+		JTable unFinishTable=new JTable();
+		unFinishTable.setDefaultRenderer(Object.class, tcr);
+		unFinishTable.setRowHeight(20);
+		String[] unfcn={"项目编号","状态"};
+		String[][] unarr=apd.getUnFinishProject(mf);
+		DefaultTableModel undm=new DefaultTableModel(unarr,unfcn){
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+		};
+		unFinishTable.setModel(undm);
+		JPanel unp=new JPanel();
+		unp.setLayout(null);
+		JScrollPane unjsp=new JScrollPane();
+		unjsp.setBounds(105,10,400,700);
+		unjsp.setViewportView(unFinishTable);
+		unp.add(unjsp);
+		lp.add("North",unlabel);
+		lp.add(unp);
+		p.add(lp);
+		p.add(rp);
 		return p;
 	}
 	
