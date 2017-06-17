@@ -44,7 +44,6 @@ public class ExpertManage {
 	JFrame mf;
 	BasicData bd = new BasicData();
 	ExpertData ed = new ExpertData();
-
 	public ExpertManage(String user) {
 		mf = new JFrame();
 		mf.setTitle("ExpertManage");
@@ -62,7 +61,6 @@ public class ExpertManage {
 		mfc.add(MTPane);
 		mf.setVisible(true);
 	}
-
 	public static void main(String[] args) {
 		new ExpertManage("test");
 	}
@@ -740,6 +738,7 @@ public class ExpertManage {
 		JPanel lp=new JPanel();
 		lp.setLayout(new BorderLayout());
 		JPanel rp=new JPanel();
+		rp.setLayout(new BorderLayout());
 		JLabel unlabel=new JLabel("未安排项目",JLabel.CENTER);
 		unlabel.setFont(new Font("宋体",1, 20));
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
@@ -760,6 +759,16 @@ public class ExpertManage {
 			}
 		};
 		unFinishTable.setModel(undm);
+		unFinishTable.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				if(e.getClickCount()==2&&e.getButton()==1){
+					int r=unFinishTable.rowAtPoint(e.getPoint());
+					String pid=unFinishTable.getValueAt(r, 0).toString();
+					mf.setEnabled(false);
+					new ShowProjectFrame(mf,pid);
+				}
+			}
+		});
 		JPanel unp=new JPanel();
 		unp.setLayout(null);
 		JScrollPane unjsp=new JScrollPane();
@@ -769,6 +778,33 @@ public class ExpertManage {
 		lp.add("North",unlabel);
 		lp.add(unp);
 		p.add(lp);
+		
+		JLabel resultlabel=new JLabel("项目抽选结果",JLabel.CENTER);
+		resultlabel.setFont(new Font("宋体",1, 20));
+		rp.add("North",resultlabel);
+		JPanel rbp=new JPanel();
+		rbp.setLayout(null);
+		JScrollPane rjsp=new JScrollPane();
+		String[] rcn={"项目编号","状态"};
+		String[][] rarr={{"",""}};
+		DefaultTableModel rdm=new DefaultTableModel(rarr,rcn){
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+		};
+		JTable rtable=new JTable();
+		rtable.setRowHeight(20);
+		rtable.setModel(rdm);
+		rtable.setDefaultRenderer(Object.class, tcr);
+		rjsp.setViewportView(rtable);
+		rjsp.setBounds(105,10,400,700);
+		rbp.add(rjsp);
+		rp.add(rbp);
 		p.add(rp);
 		return p;
 	}

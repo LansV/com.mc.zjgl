@@ -3,13 +3,11 @@ package com.mc.zjgl;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -31,26 +29,36 @@ public class ShowProjectFrame extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = -7531205243496977969L;
+	
 	public static void main(String[] args){
 		JFrame f=new JFrame();
-		new ShowProjectFrame(f);
+		new ShowProjectFrame(f,"");
 	}
 	public ShowProjectFrame(){
 		
 	}
-	public ShowProjectFrame(JFrame f){
+	public ShowProjectFrame(JFrame f,String pid){
 		this.setResizable(false);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(10,10,1140,800);
-		this.add(registerProject(f));
+		this.setTitle("项目信息");
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				f.setEnabled(true);
+				dispose();
+			}
+		});
+		this.setBounds(150,40,1140,750);
+		this.add(registerProject(this,pid));
 		this.setVisible(true);
 	}
-	public JPanel registerProject(JFrame f) {
-		RegisterNeedExpertData rnd = new RegisterNeedExpertData();
-		CheckFormat cf = new CheckFormat();
+	public JPanel registerProject(JFrame f,String pid) {
+		//RegisterNeedExpertData rnd = new RegisterNeedExpertData();
+		AllProjectData apd=new AllProjectData();
+		ArrayList<String> ls = apd.getProjectInfo(f, pid);
+		//CheckFormat cf = new CheckFormat();
 		JPanel p = new JPanel();
 		p.setLayout(null);
-		JLabel ptitle = new JLabel("专家需求登记", JLabel.CENTER);
+		JLabel ptitle = new JLabel("专家需求记录表", JLabel.CENTER);
 		Font ft = new Font("宋体", 1, 25);
 		ptitle.setFont(ft);
 		ptitle.setBounds(515, 20, 200, 25);
@@ -58,7 +66,7 @@ public class ShowProjectFrame extends JFrame{
 		// -----------------------------------------------------
 		JLabel projectIdL = new JLabel("项目编号：");
 		projectIdL.setBounds(80, 60, 200, 20);
-		JLabel projectId = new JLabel(rnd.getProjectId(f));
+		JLabel projectId = new JLabel(pid);
 		projectId.setBounds(150, 60, 200, 20);
 		p.add(projectId);
 		p.add(projectIdL);
@@ -66,12 +74,15 @@ public class ShowProjectFrame extends JFrame{
 		projectNeedL.setBounds(80, 95, 200, 25);
 		p.add(projectNeedL);
 		JTextField projectNeedT = new JTextField();
+		projectNeedT.setText(ls.get(0));
+		projectNeedT.setEditable(false);
 		projectNeedT.setBounds(150, 95, 300, 25);
 		p.add(projectNeedT);
 		JLabel projectDateL = new JLabel("日期：");
 		projectDateL.setBounds(850, 95, 200, 25);
 		p.add(projectDateL);
 		JTextField projectDateT = new JTextField();
+		projectDateT.setText(ls.get(1));
 		projectDateT.setBounds(890, 95, 120, 25);
 		p.add(projectDateT);
 		// --------------------
@@ -79,12 +90,14 @@ public class ShowProjectFrame extends JFrame{
 		projectNameL.setBounds(80, 130, 200, 25);
 		p.add(projectNameL);
 		JTextField projectNameT = new JTextField();
+		projectNameT.setText(ls.get(2));
 		projectNameT.setBounds(150, 130, 300, 25);
 		p.add(projectNameT);
 		JLabel projectDateL1 = new JLabel("预计工作时长：                       天");
 		projectDateL1.setBounds(850, 130, 500, 25);
 		p.add(projectDateL1);
 		JTextField projectDateT1 = new JTextField();
+		projectDateT1.setText(ls.get(3));
 		projectDateT1.setBounds(940, 130, 60, 25);
 		p.add(projectDateT1);
 		// -------------------------------------------
@@ -92,24 +105,27 @@ public class ShowProjectFrame extends JFrame{
 		projectContactL.setBounds(80, 165, 200, 25);
 		p.add(projectContactL);
 		JTextField projectContactT = new JTextField();
+		projectContactT.setText(ls.get(4));
 		projectContactT.setBounds(160, 165, 300, 25);
 		p.add(projectContactT);
 		JLabel projectPosstionL = new JLabel("职位：");
 		projectPosstionL.setBounds(550, 165, 200, 25);
 		p.add(projectPosstionL);
 		JComboBox<String> chooseExpertPosition = new JComboBox<String>();
-		chooseExpertPosition.addItem("请选择职位");
-		ArrayList<String> ocls = rnd.getOccupation(f);
+		chooseExpertPosition.setEnabled(false);
+		chooseExpertPosition.addItem(ls.get(5));
+/*		ArrayList<String> ocls = rnd.getOccupation(f);
 		int oclss = ocls.size();
 		for (int i = 0; i < oclss; i++) {
 			chooseExpertPosition.addItem(ocls.get(i));
-		}
+		}*/
 		chooseExpertPosition.setBounds(585, 165, 120, 25);
 		p.add(chooseExpertPosition);
 		JLabel projectTelL = new JLabel("联系电话：");
 		projectTelL.setBounds(850, 165, 500, 25);
 		p.add(projectTelL);
 		JTextField projectTelT = new JTextField();
+		projectTelT.setText(ls.get(6));
 		projectTelT.setBounds(910, 165, 120, 25);
 		p.add(projectTelT);
 		// --------------------------------------------
@@ -117,12 +133,14 @@ public class ShowProjectFrame extends JFrame{
 		projectMeetPlaceL.setBounds(80, 200, 200, 25);
 		p.add(projectMeetPlaceL);
 		JTextField projectMeetPlaceT = new JTextField();
+		projectMeetPlaceT.setText(ls.get(7));
 		projectMeetPlaceT.setBounds(150, 200, 200, 25);
 		p.add(projectMeetPlaceT);
 		JLabel projectMeetDateL = new JLabel("集合日期：");
 		projectMeetDateL.setBounds(850, 200, 200, 25);
 		p.add(projectMeetDateL);
 		JTextField projectMeetDateT = new JTextField();
+		projectMeetDateT.setText(ls.get(8));
 		projectMeetDateT.setBounds(910, 200, 120, 25);
 		p.add(projectMeetDateT);
 		// ----------------------------------------------
@@ -131,6 +149,7 @@ public class ShowProjectFrame extends JFrame{
 		p.add(projectWorkL);
 		JScrollPane showProjectWork = new JScrollPane();
 		JTextArea projectWorkT = new JTextArea();
+		projectWorkT.setText(ls.get(9));
 		projectWorkT.setLineWrap(true);
 		showProjectWork.setViewportView(projectWorkT);
 		showProjectWork.setBounds(150, 245, 880, 150);
@@ -140,20 +159,21 @@ public class ShowProjectFrame extends JFrame{
 		projectTraficL.setBounds(80, 413, 200, 25);
 		p.add(projectTraficL);
 		JTextField projectTraficT = new JTextField();
+		projectTraficT.setText(ls.get(10));
 		projectTraficT.setBounds(150, 413, 880, 25);
 		p.add(projectTraficT);
 		// ---------------------------------------------------------------
 		ArrayList<String> comboboxselect = new ArrayList<String>();
-		String[][] pgarr = rnd.getProfessionalgroup(f);
-		int pgarrl = pgarr.length;
+		//String[][] pgarr = rnd.getProfessionalgroup(f);
+		//int pgarrl = pgarr.length;
 		JScrollPane expertGroupJSP = new JScrollPane();
 		String[] cn = { "需求专业类型", "需求人数" };
-		String[][] arr = { { "", "" }, { "合计（单位:人）", "0" } };
-		JComboBox<String> pg = new JComboBox<String>();
+		String[][] arr = apd.getExpertNeed(f, pid);
+/*		JComboBox<String> pg = new JComboBox<String>();
 		pg.addItem("请选择专业组别");
 		for (int i = 0; i < pgarrl; i++) {
 			pg.addItem(pgarr[i][1]);
-		}
+		}*/
 		JTable expertGroupTable = new JTable() {
 
 			/**
@@ -218,7 +238,7 @@ public class ShowProjectFrame extends JFrame{
 					super.processKeyEvent(e);
 			}
 		};
-		pg.addItemListener(new ItemListener() {
+/*		pg.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				// TODO Auto-generated method stub
@@ -227,22 +247,20 @@ public class ShowProjectFrame extends JFrame{
 					System.out.println(s);
 				}
 			}
-
-		});
+		});*/
 		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn) {
 			/**
-			 * 
 			 */
 			private static final long serialVersionUID = 9174681503529842494L;
 
 			public boolean isCellEditable(int r, int c) {
-				int i = expertGroupTable.getRowCount() - 1;
+/*				int i = expertGroupTable.getRowCount() - 1;
 				if (r < i && c == 1) {
 					return true;
 				}
 				if (r < i && c == 0) {
 					return true;
-				}
+				}*/
 				return false;
 			}
 		};
@@ -268,14 +286,14 @@ public class ShowProjectFrame extends JFrame{
 		tcr.setHorizontalAlignment(JLabel.CENTER);
 		expertGroupTable.setDefaultRenderer(Object.class, tcr);
 		expertGroupTable.setModel(expertGroupTableModel);
-		expertGroupTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(pg));
+		//expertGroupTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(pg));
 		expertGroupTable.setRowHeight(22);
 		expertGroupJSP.setViewportView(expertGroupTable);
 		expertGroupJSP.setBounds(80, 455, 980, 90);
-		Object[] row = new Object[2];
+/*		Object[] row = new Object[2];
 		row[0] = "";
-		row[1] = "";
-		expertGroupTable.addKeyListener(new KeyAdapter() {
+		row[1] = "";*/
+/*		expertGroupTable.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO 自动生成的方法存根
@@ -290,25 +308,27 @@ public class ShowProjectFrame extends JFrame{
 					}
 				}
 			}
-		});
+		});*/
 		p.add(expertGroupJSP);
 		// ------------------------------------------------
 		JLabel avoidL = new JLabel("规避公司：");
 		avoidL.setBounds(80, 555, 200, 25);
 		JComboBox<String> avoidC = new JComboBox<String>();
 		avoidC.setBounds(150, 555, 300, 25);
-		avoidC.addItem("请选择规避公司");
-		ArrayList<String> acls = rnd.getAvoidCompany(f);
+		avoidC.addItem(ls.get(11));
+		avoidC.setEnabled(false);
+/*		ArrayList<String> acls = rnd.getAvoidCompany(f);
 		int aclss = acls.size();
 		for (int i = 0; i < aclss; i++) {
 			avoidC.addItem(acls.get(i));
-		}
+		}*/
 		p.add(avoidC);
 		p.add(avoidL);
 		JLabel projectView = new JLabel("协会意见：");
 		projectView.setBounds(80, 590, 200, 25);
 		p.add(projectView);
 		JTextField projectViewT = new JTextField();
+		projectViewT.setText(ls.get(12));
 		projectViewT.setBounds(150, 590, 880, 25);
 		p.add(projectViewT);
 		// ----------------------------------------------------
@@ -316,81 +336,15 @@ public class ShowProjectFrame extends JFrame{
 		projectMarkL.setBounds(80, 625, 200, 25);
 		p.add(projectMarkL);
 		JTextField projectMarkT = new JTextField();
+		projectMarkT.setText(ls.get(13));
 		projectMarkT.setBounds(150, 625, 880, 25);
 		p.add(projectMarkT);
-		JButton register = new JButton("登记");
+		JButton register = new JButton("抽选");
 		register.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				String pjId = projectId.getText().trim();
-				String pjNeed = projectNeedT.getText().trim();
-				String pjNeedDate = projectDateT.getText().trim();
-				String pjName = projectNameT.getText().trim();
-				String pjNeedDay = projectDateT1.getText().trim();
-				String pjContact = projectContactT.getText().trim();
-				String pjOccupation = chooseExpertPosition.getSelectedItem().toString().trim();
-				String pjTel = projectTelT.getText().trim();
-				String pjMeetPlace = projectMeetPlaceT.getText().trim();
-				String pjMeetDate = projectMeetDateT.getText().trim();
-				String pjWork = projectWorkT.getText().trim();
-				String pjTraffic = projectTraficT.getText().trim();
-				String pjAvoid = avoidC.getSelectedItem().toString().trim();
-				String pjView = projectViewT.getText().trim();
-				String pjMark = projectMarkT.getText().trim();
-				if (expertGroupTable.isEditing()) {
-					expertGroupTable.getCellEditor().stopCellEditing();
-				}
-				if (pjId.length() != 0 && pjNeed.length() != 0 && pjNeedDate.length() != 0 && pjName.length() != 0
-						&& pjNeedDay.length() != 0 && pjContact.length() != 0
-						&& chooseExpertPosition.getSelectedIndex() != 0 && pjTel.length() != 0
-						&& pjMeetPlace.length() != 0 && pjMeetDate.length() != 0 && pjWork.length() != 0
-						&& pjTraffic.length() != 0 && pjView.length() != 0) {
-					if (cf.isDate(pjMeetDate) && cf.isDate(pjNeedDate)) {
-						if (cf.isFloat(pjNeedDay)) {
-							if (avoidC.getSelectedIndex() == 0) {
-								pjAvoid = "";
-							}
-							String s = expertGroupTable.getValueAt(expertGroupTable.getRowCount() - 1, 1).toString();
-							int cp = Integer.parseInt(s);
-							if (cp > 0) {
-								System.out.println(cp);
-								String str = "insert into projectregister values(" + pjId + ",'" + pjNeed + "','"
-										+ pjNeedDate + "','" + pjName + "'," + pjNeedDay + ",'" + pjContact + "'," + "'"
-										+ pjOccupation + "','" + pjTel + "','" + pjMeetPlace + "','" + pjMeetDate
-										+ "','" + pjWork + "','" + pjTraffic + "','" + pjAvoid + "'," + "'" + pjView
-										+ "','" + pjMark + "',0);";
-								int rowc = expertGroupTable.getRowCount() - 1;
-								String str2 = "";
-								for (int t = 0; t < rowc; t++) {
-									String f = expertGroupTable.getValueAt(t, 0).toString();
-									String se = expertGroupTable.getValueAt(t, 1).toString();
-									String id = "";
-									for (int tt = 0; tt < pgarrl; tt++) {
-										if (f.equals(pgarr[tt][1])) {
-											id = pgarr[tt][0];
-										}
-									}
-									str2 = str2 + "insert into expertneed values(" + pjId + "," + id + "," + se
-											+ ",0);";
-								}
-								str = str + str2;
-								int i = rnd.insertProjectRegister(f, str);
-								if (i == 1) {
-									JOptionPane.showMessageDialog(f, "登记成功");
-								}
-							} else {
-								JOptionPane.showMessageDialog(f, "请填写需求人数");
-							}
-						} else {
-							JOptionPane.showMessageDialog(f, "预计工作时长请填写正数");
-						}
-					} else {
-						JOptionPane.showMessageDialog(f, "输入日期格式错误");
-					}
-				} else {
-					JOptionPane.showMessageDialog(f, "信息不完整");
-				}
+				
 			}
 		});
 		register.setBounds(550, 680, 80, 25);
