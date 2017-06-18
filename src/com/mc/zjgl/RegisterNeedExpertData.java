@@ -27,7 +27,15 @@ public class RegisterNeedExpertData {
 				ls.add(res.getString("professionalgroupname"));
 			}
 		}catch(SQLException e){
-			
+			StringWriter sw = new StringWriter();
+		    PrintWriter pw = new PrintWriter(sw, true);
+		    e.printStackTrace(pw);
+		    String mn = new Exception().getStackTrace()[0].getMethodName();// 获得当前的方法名 
+		    String dn = new Exception().getStackTrace()[1].getClassName();// 获得调用类
+			String errorString="错误类："+this.getClass().getName()+"\n错误方法："+mn+"\n调用类："+dn+"\n错误信息：\n"+sw.toString();
+			Rectangle b = f.getBounds();
+			new ErrorDialog(f, b, errorString);
+			//************************************************
 		}
 		int xl = 2;
 		String[][] data = new String[ls.size() / xl][xl];
