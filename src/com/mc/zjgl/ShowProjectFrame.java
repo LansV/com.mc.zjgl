@@ -30,10 +30,10 @@ public class ShowProjectFrame extends JFrame{
 	 */
 	private static final long serialVersionUID = -7531205243496977969L;
 	
-	public static void main(String[] args){
+/*	public static void main(String[] args){
 		JFrame f=new JFrame();
 		new ShowProjectFrame(f,"");
-	}
+	}*/
 	public ShowProjectFrame(){
 		
 	}
@@ -344,7 +344,11 @@ public class ShowProjectFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
-				
+				String work=projectWorkT.getText();
+				String meetdate=projectMeetDateT.getText();
+				String name=projectNameT.getText();
+				f.setEnabled(false);
+				new RendomExpert(f,pid, name, work, meetdate);
 			}
 		});
 		register.setBounds(550, 680, 80, 25);
