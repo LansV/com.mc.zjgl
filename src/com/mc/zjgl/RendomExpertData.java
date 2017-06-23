@@ -57,18 +57,25 @@ public class RendomExpertData {
 							+ "where expertneed.projectid = " + pid + " and expertneed.needgroup=" + group
 							+ " and expert.expertcompany !='" + avoid + "' and "
 							+ "(expertplan.expertplandate is null or expertplan.expertplandate!='" + plandate + "')");
-			int i = 1;
 			while (res.next()) {
-				ls.add(Integer.toString(i));
-				ls.add(res.getString("expertid"));
-				ls.add(res.getString("professionalgroupname"));
-				ls.add(res.getString("expertname"));
-				ls.add(res.getString("tel"));
-				i++;
+				//ls.add(Integer.toString(i));
+				rs.add(res.getString("expertid"));
+				rs.add(res.getString("professionalgroupname"));
+				rs.add(res.getString("expertname"));
+				rs.add(res.getString("tel"));
 			}
 		} catch (SQLException e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
+		}
+		int c=5;
+		for(int i=0;i<ls.size()/5;i++){
+			int s=i*c+1;
+			for(int j=ls.size()/5;j>i;j--){
+				if(ls.get(s).equals(ls.get(j))){
+					System.out.println("list remove "+ls.get(s));
+				}
+			}
 		}
 		int xl = 5;
 		int lss = ls.size() / xl;
@@ -81,14 +88,15 @@ public class RendomExpertData {
 				if (j == 1) {
 					if (countls.size() < 1) {
 						// System.out.println("add "+ls.get(j + count * xl));
+						b=true;
 						countls.add(ls.get(j + count * xl));
 					} else {
 						for (int t = 0; t < countls.size(); t++) {
 							if (countls.get(t).equals(ls.get(j + count * xl))) {
 								lss = lss - 1;
 								b = false;
-								// System.out.println("get repeat "+ls.get(j +
-								// count * xl));
+								 System.out.println("get repeat："+ls.get(j +
+								 count * xl));
 								break;
 							} else {
 								b = true;
@@ -167,7 +175,7 @@ public class RendomExpertData {
 		ArrayList<String> countls = new ArrayList<String>();
 		ArrayList<Object> res = new ArrayList<Object>();
 		for (int i = 0; i < narrl; i++) {
-			// System.out.println("第" + (i + 1) + "次筛选"+" 需要"+narr[i][1]+"人");
+			 System.out.println("第" + (i + 1) + "次筛选"+" 需要"+narr[i][1]+"人");
 			red.getRendomExpert(f,pid, narr[i][0], Integer.parseInt(narr[i][1]), date, avoid, countls, res);
 		}
 		int xl = 7;
