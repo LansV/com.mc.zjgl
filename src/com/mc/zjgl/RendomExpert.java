@@ -2,10 +2,13 @@ package com.mc.zjgl;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -121,6 +124,20 @@ public class RendomExpert extends JFrame {
 		fjsp.setViewportView(fr);
 		fjsp.setBounds(10, 40, 570, 300);
 		bp.add(fjsp);
+		JButton b = new JButton("确认");
+		b.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				int cr = fr.getRowCount();
+				System.out.println(cr);
+				for (int i = 0; i < cr; i++) {
+					System.out.println(fr.getValueAt(i, 6));
+				}
+			}
+		});
+		b.setBounds(250, 360, 80, 24);
+		bp.add(b);
 		mp.add("North", mdl);
 		mp.add(bp);
 		c.add(mp);

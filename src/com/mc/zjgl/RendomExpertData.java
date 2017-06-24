@@ -47,6 +47,19 @@ public class RendomExpertData {
 			ArrayList<String> countls, ArrayList<Object> rs) {
 		ArrayList<String> ls = new ArrayList<String>();
 		try {
+			String existid="";
+			if(countls.size()==0){
+				existid="''";
+			}else{
+				for(int i=0;i<countls.size();i++){
+					if(i!=countls.size()-1){
+						existid=existid+countls.get(i)+",";
+					}else{
+						existid=existid+countls.get(i);
+					}
+				}
+			}
+			System.out.println(existid);
 			sql = con.createStatement();
 			res = sql.executeQuery(
 					"select expert.expertid,professionalgroup.professionalgroupname,expert.expertname,expert.tel from "
@@ -56,26 +69,20 @@ public class RendomExpertData {
 							+ "left join expert on expert.expertid=expertgroup.expertid "
 							+ "where expertneed.projectid = " + pid + " and expertneed.needgroup=" + group
 							+ " and expert.expertcompany !='" + avoid + "' and "
-							+ "(expertplan.expertplandate is null or expertplan.expertplandate!='" + plandate + "')");
+							+ "(expertplan.expertplandate is null or expertplan.expertplandate!='" + plandate + "') "
+							+ "and expert.expertid  not in ("+existid+")");
+			int i=1;
 			while (res.next()) {
-				//ls.add(Integer.toString(i));
-				rs.add(res.getString("expertid"));
-				rs.add(res.getString("professionalgroupname"));
-				rs.add(res.getString("expertname"));
-				rs.add(res.getString("tel"));
+				ls.add(Integer.toString(i));
+				ls.add(res.getString("expertid"));
+				ls.add(res.getString("professionalgroupname"));
+				ls.add(res.getString("expertname"));
+				ls.add(res.getString("tel"));
+				i++;
 			}
 		} catch (SQLException e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
-		}
-		int c=5;
-		for(int i=0;i<ls.size()/5;i++){
-			int s=i*c+1;
-			for(int j=ls.size()/5;j>i;j--){
-				if(ls.get(s).equals(ls.get(j))){
-					System.out.println("list remove "+ls.get(s));
-				}
-			}
 		}
 		int xl = 5;
 		int lss = ls.size() / xl;
@@ -83,36 +90,10 @@ public class RendomExpertData {
 		String[][] data = new String[lss][xl];
 		int count = 0;
 		for (int i = 0; i < lsst; i++) {
-			boolean b = false;
+			//boolean b = false;
 			for (int j = 0; j < xl; j++) { // 列
-				if (j == 1) {
-					if (countls.size() < 1) {
-						// System.out.println("add "+ls.get(j + count * xl));
-						b=true;
-						countls.add(ls.get(j + count * xl));
-					} else {
-						for (int t = 0; t < countls.size(); t++) {
-							if (countls.get(t).equals(ls.get(j + count * xl))) {
-								lss = lss - 1;
-								b = false;
-								 System.out.println("get repeat："+ls.get(j +
-								 count * xl));
-								break;
-							} else {
-								b = true;
-							}
-						}
-						if (b == true) {
-							countls.add(ls.get(j + count * xl));
-							// System.out.println("add2 "+ls.get(j + count *
-							// xl));
-						}
-					}
-				}
 				data[i][j] = ls.get(j + count * xl);
 			}
-			// System.out.println(data[i][0] + " " + data[i][1] + " " +
-			// data[i][2] + " " + data[i][3]);
 			count++;
 		}
 		count = 0;
@@ -128,6 +109,7 @@ public class RendomExpertData {
 				int h = rs.size() / 7;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
+				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
@@ -142,6 +124,7 @@ public class RendomExpertData {
 				int h = rs.size() / 7;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
+				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
@@ -156,6 +139,7 @@ public class RendomExpertData {
 				int h = rs.size() / 7;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
+				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
