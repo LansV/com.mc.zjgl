@@ -62,7 +62,8 @@ public class RendomExpertData {
 			System.out.println(existid);
 			sql = con.createStatement();
 			res = sql.executeQuery(
-					"select expert.expertid,professionalgroup.professionalgroupname,expert.expertname,expert.tel from "
+					"select expert.expertid,professionalgroup.professionalgroupname,expert.expertname,expert.professional,"
+					+ "expert.occupation,expert.tel from "
 							+ "expertneed left join expertgroup on needgroup=expertgroup.professionalgroup "
 							+ "left join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid "
 							+ "left join expertplan on expertplan.expertid=expertgroup.expertid "
@@ -70,13 +71,16 @@ public class RendomExpertData {
 							+ "where expertneed.projectid = " + pid + " and expertneed.needgroup=" + group
 							+ " and expert.expertcompany !='" + avoid + "' and "
 							+ "(expertplan.expertplandate is null or expertplan.expertplandate!='" + plandate + "') "
-							+ "and expert.expertid  not in ("+existid+")");
+							+ "and expert.expertid  not in ("+existid+")"
+							);
 			int i=1;
 			while (res.next()) {
 				ls.add(Integer.toString(i));
 				ls.add(res.getString("expertid"));
 				ls.add(res.getString("professionalgroupname"));
 				ls.add(res.getString("expertname"));
+				ls.add(res.getString("professional"));
+				ls.add(res.getString("occupation"));
 				ls.add(res.getString("tel"));
 				i++;
 			}
@@ -84,7 +88,7 @@ public class RendomExpertData {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
-		int xl = 5;
+		int xl = 7;
 		int lss = ls.size() / xl;
 		int lsst = lss;
 		String[][] data = new String[lss][xl];
@@ -106,13 +110,15 @@ public class RendomExpertData {
 			randomSet(0, lss, num, set);
 			// System.out.print("抽选值：");
 			for (int i : set) {
-				int h = rs.size() / 7;
+				int h = rs.size() / 9;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
 				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
+				rs.add(data[i][5]);
+				rs.add(data[i][6]);
 				rs.add("");
 				rs.add(false);
 				// System.out.print(i+" ");
@@ -121,13 +127,15 @@ public class RendomExpertData {
 		} else if (lss < num) {
 			JOptionPane.showMessageDialog(f, "符合条件专家数量未达到最低要求");
 			for (int i = 0; i < lss; i++) {
-				int h = rs.size() / 7;
+				int h = rs.size() / 9;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
 				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
+				rs.add(data[i][5]);
+				rs.add(data[i][6]);
 				rs.add("");
 				rs.add(false);
 			}
@@ -136,13 +144,15 @@ public class RendomExpertData {
 			randomSet(0, lss, num * 2, set);
 			// System.out.print("抽选值：");
 			for (int i : set) {
-				int h = rs.size() / 7;
+				int h = rs.size() / 9;
 				rs.add(Integer.toString(h + 1));
 				rs.add(data[i][1]);
 				countls.add(data[i][1]);
 				rs.add(data[i][2]);
 				rs.add(data[i][3]);
 				rs.add(data[i][4]);
+				rs.add(data[i][5]);
+				rs.add(data[i][6]);
 				rs.add("");
 				rs.add(false);
 				// System.out.print(i+" ");
@@ -162,7 +172,7 @@ public class RendomExpertData {
 			 System.out.println("第" + (i + 1) + "次筛选"+" 需要"+narr[i][1]+"人");
 			red.getRendomExpert(f,pid, narr[i][0], Integer.parseInt(narr[i][1]), date, avoid, countls, res);
 		}
-		int xl = 7;
+		int xl = 9;
 		int resl = res.size() / xl;
 		Object[][] data = new Object[resl][xl];
 		int count = 0;

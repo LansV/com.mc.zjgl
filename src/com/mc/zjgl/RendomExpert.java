@@ -131,9 +131,29 @@ public class RendomExpert extends JFrame {
 				// TODO 自动生成的方法存根
 				int cr = fr.getRowCount();
 				System.out.println(cr);
+				String sqlex="";
 				for (int i = 0; i < cr; i++) {
-					System.out.println(fr.getValueAt(i, 6));
+					int b=0;
+					if((boolean) fr.getValueAt(i, 8)){
+						b=1;
+					}
+					//sqlex=sqlex+"insert into expertplan values("+pid+",";
+/*					for(int j=0;j<10;j++){
+						if(fr.getValueAt(i, j)!=null){
+							if(j>2&&j<8){
+								sqlex=sqlex+"'"+fr.getValueAt(i, j).toString()+"',";
+							}else{
+								sqlex=sqlex+fr.getValueAt(i, j).toString();
+							}
+						}
+					}*/
+				    sqlex=sqlex+"insert into expertplan values("
+				    	+ ""+pid+","+fr.getValueAt(i, 0).toString()+","+fr.getValueAt(i, 1).toString()+","
+				    	+ "'"+fr.getValueAt(i, 2).toString()+"','"+fr.getValueAt(i, 3).toString()+"','"+fr.getValueAt(i, 4).toString()+"',"
+				    	+ "'"+fr.getValueAt(i, 5).toString()+"','"+fr.getValueAt(i, 6)+"',"
+				    	+ "'"+fr.getValueAt(i, 7).toString()+"',"+b+",'"+meetdate+"');"+"\n";
 				}
+				System.out.println(sqlex);
 			}
 		});
 		b.setBounds(250, 360, 80, 24);
@@ -164,7 +184,7 @@ class MyTable extends AbstractTableModel {
 
 	Object[][] p = red.getRendomResult(f, pid, date, avoid);
 
-	String[] n = { "序号", "专家编号", "专业类别", "姓名", "联系电话", "备注", "选择" };
+	String[] n = { "序号", "专家编号", "专业类别", "姓名","专业","职位", "联系电话", "备注", "选择" };
 
 	@Override
 	public int getRowCount() {

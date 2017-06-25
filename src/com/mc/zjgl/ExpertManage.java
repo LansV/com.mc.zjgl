@@ -16,10 +16,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -280,8 +283,9 @@ public class ExpertManage {
 				String expertid = expertGroupTable.getValueAt(sr, 0).toString().trim();
 				String pg = expertGroupTable.getValueAt(sr, 1).toString().trim();
 				String name = expertGroupTable.getValueAt(sr, 2).toString().trim();
+				mf.setEnabled(false);
 				new CheckBoxFrame(mf, professionalgroup, expertGroupTableModel, cn, expertid, pg, name,
-						expertGroupTable.getX(), expertGroupTable.getY());
+						mf.getX(), mf.getY());
 			}
 		});
 		editRight.add(edit);
@@ -826,7 +830,13 @@ class CheckBoxFrame extends JFrame {
 			String name, int x, int y) {
 		int lss = ls.length;
 		this.setTitle("修改" + name + "组别");
-		JFrame ft = this;
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				f.setEnabled(true);
+				dispose();
+			}
+		});
 		this.setResizable(false);
 		Container c = this.getContentPane();
 		c.setLayout(new BorderLayout());
@@ -888,19 +898,22 @@ class CheckBoxFrame extends JFrame {
 				}
 				if (count == 0) {
 					JOptionPane.showMessageDialog(c, "请至少选择一项");
-					ft.dispose();
+					f.setEnabled(true);
+					dispose();
+					f.setEnabled(false);
 					new CheckBoxFrame(f, ls, dm, cn, expertid, pg, name, x, y);
 				} else {
 					ed.editProfessionalGroup(f, str);
-					JOptionPane.showMessageDialog(ft, "修改完成");
+					JOptionPane.showMessageDialog(c, "修改完成");
 					dm.setDataVector(ed.getExpert(f), cn);
-					ft.dispose();
+					f.setEnabled(true);
+					dispose();
 				}
 			}
 		});
 		bp.add(b);
 		c.add("South", bp);
-		this.setBounds(x + 50, y + 350, 300, 80 + 20 * lss);
+		this.setBounds(x + 330, y + 350, 300, 80 + 20 * lss);
 		this.setVisible(true);
 	}
 }
