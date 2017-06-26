@@ -37,7 +37,7 @@ public class ExpertData {
 					id=Integer.toString(maxid);
 				}
 				String sqlstr="insert into expert values ("+id+",'"+en+"','"+es+"','"+ebd+"','"+educ+"','"+ec+"',"
-						+ ""+prof+","+occup+",'"+tel+"','"+area+"','"+address+"','"+mark+"');"
+						+ "'"+prof+"','"+occup+"','"+tel+"','"+area+"','"+address+"','"+mark+"');"
 								+ "insert into expertgroup values("+id+","+pgid+")";
 				System.out.println(sqlstr);
 				sql.execute(sqlstr);
@@ -59,7 +59,7 @@ public class ExpertData {
 		return i;
 	}
 
-	public String[][] getExpert(JFrame f){
+	public String[][] getExpert(JFrame f,String fifterGroup){
 		ArrayList<String> ls = new ArrayList<String>();
 		try {
 			sql=con.createStatement();
@@ -70,9 +70,9 @@ public class ExpertData {
 					+ " select expert.expertid,professionalgroupname from "
 					+ " expert"
 					+ " inner join expertgroup on expert.expertid=expertgroup.expertid"
-					+ " inner join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid"
-					+ ") b"
-					+ " WHERE expertid = A.expertid for xml path('')),1,1,'')"
+					+ " inner join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid "
+					+ " )  b "
+					+ " WHERE expertid = A.expertid  for xml path('')),1,1,'')"
 					+ "),MAX(expertname) as expertname ,MAX(expertsex) as expertsex,MAX(expertburndate) as expertburndate,"
 					+ "max(education) as education,MAX(expertcompany) as expertcompany,MAX(professional) as professionalname,"
 					+ "MAX(occupation) as occupationname,MAX(tel) as tel,MAX(area) as area,MAX(address) as address,"
@@ -86,7 +86,7 @@ public class ExpertData {
 					//+ " inner join professional on expert.professional=professional.professionalid"
 					+ " inner join professionalgroup on expertgroup.professionalgroup=professionalgroup.professionalgroupid"
 					//+ " inner join occupation on expert.occupation=occupation.occupationid"
-					+ " ) A group by expertid");
+					+ " ) A where professionalgroupname like '%"+fifterGroup+"%' group by expertid ");
 			while(res.next()){
 				ls.add(res.getString("expertid"));
 				ls.add(res.getString("professionalgroupname"));

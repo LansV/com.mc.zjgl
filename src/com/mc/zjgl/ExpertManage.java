@@ -1,6 +1,7 @@
 package com.mc.zjgl;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -42,11 +43,13 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 public class ExpertManage {
 	JFrame mf;
 	BasicData bd = new BasicData();
 	ExpertData ed = new ExpertData();
+	String fiftergroup="";
 	public ExpertManage(String user) {
 		mf = new JFrame();
 		mf.setTitle("ExpertManage");
@@ -185,8 +188,8 @@ public class ExpertManage {
 		String[][] professionalgroup = bd.getGroup(mf);
 		String[][] sex = bd.getSex(mf);
 		String[][] education = bd.getEducation(mf);
-		String[][] professional = bd.getProfessionnal(mf);
-		String[][] occupation = bd.getOccupation(mf);
+		//String[][] professional = bd.getProfessionnal(mf);
+		//String[][] occupation = bd.getOccupation(mf);
 		JPanel p = new JPanel();
 		p.setLayout(null);
 		JLabel ptitle = new JLabel("添加专家信息", JLabel.CENTER);
@@ -230,22 +233,30 @@ public class ExpertManage {
 		expertCompany.addFocusListener(new MyFocusListener("请输入专家工作单位", expertCompany));
 		expertCompany.setBounds(780, 60, 120, 25);
 		p.add(expertCompany);
-		JComboBox<String> chooseExpertProfession = new JComboBox<String>();
+/*		JComboBox<String> chooseExpertProfession = new JComboBox<String>();
 		chooseExpertProfession.addItem("请选择专家专业");
 		int professionall = professional.length;
 		for (int i = 0; i < professionall; i++) {
 			chooseExpertProfession.addItem(professional[i][1]);
 		}
 		chooseExpertProfession.setBounds(930, 60, 120, 25);
-		p.add(chooseExpertProfession);
-		JComboBox<String> chooseExpertPosition = new JComboBox<String>();
+		p.add(chooseExpertProfession);*/
+		JTextField expertProfessional = new JTextField("请输入专家专业领域");
+		expertProfessional.addFocusListener(new MyFocusListener("请输入专家专业领域", expertProfessional));
+		expertProfessional.setBounds(930, 60, 120, 25);
+		p.add(expertProfessional);
+/*		JComboBox<String> chooseExpertPosition = new JComboBox<String>();
 		chooseExpertPosition.addItem("请选择专家职位");
 		int occupationl = occupation.length;
 		for (int i = 0; i < occupationl; i++) {
 			chooseExpertPosition.addItem(occupation[i][1]);
 		}
 		chooseExpertPosition.setBounds(30, 100, 120, 25);
-		p.add(chooseExpertPosition);
+		p.add(chooseExpertPosition);*/
+		JTextField expertOccupation = new JTextField("请输入专家职位");
+		expertOccupation.addFocusListener(new MyFocusListener("请输入专家职位", expertOccupation));
+		expertOccupation.setBounds(30, 100, 120, 25);
+		p.add(expertOccupation);
 		JTextField expertTel = new JTextField("请输入联系电话");
 		expertTel.addFocusListener(new MyFocusListener("请输入联系电话", expertTel));
 		expertTel.setBounds(180, 100, 120, 25);
@@ -267,9 +278,16 @@ public class ExpertManage {
 		JButton addExpert = new JButton("添加");
 		addExpert.setBounds(575, 180, 80, 25);
 		p.add(addExpert);
+		JComboBox<String> fifterGroup = new JComboBox<String>();
+		fifterGroup.addItem("筛选专业组别");
+		for (int i = 0; i < pgl; i++) {
+			fifterGroup.addItem(professionalgroup[i][1]);
+		}
+		fifterGroup.setBounds(30, 180, 120, 25);
+		p.add(fifterGroup);
 		JScrollPane expertGroupJSP = new JScrollPane();
 		String[] cn = { "ID", "专业组别", "姓名", "性别", "出生年月", "学历", "工作单位", "专业领域", "职称/职位", "联系电话", "区域", "通讯地址", "备注" };
-		String[][] arr = ed.getExpert(mf);
+		String[][] arr = ed.getExpert(mf,fiftergroup);
 		JTable expertGroupTable = new JTable();
 		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn);
 		JPopupMenu editRight = new JPopupMenu();
@@ -285,8 +303,26 @@ public class ExpertManage {
 				String name = expertGroupTable.getValueAt(sr, 2).toString().trim();
 				mf.setEnabled(false);
 				new CheckBoxFrame(mf, professionalgroup, expertGroupTableModel, cn, expertid, pg, name,
-						mf.getX(), mf.getY());
+						mf.getX(), mf.getY(),fiftergroup);
 			}
+		});
+		fifterGroup.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange()==ItemEvent.SELECTED){
+					if(fifterGroup.getSelectedIndex()!=0){
+						fiftergroup=fifterGroup.getSelectedItem().toString().trim();
+						expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
+					}else{
+						fiftergroup="";
+						expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
+					}
+					System.out.println("change");
+				}
+			}
+			
 		});
 		editRight.add(edit);
 		editRight.add(delete);
@@ -298,7 +334,7 @@ public class ExpertManage {
 				String expertid = expertGroupTable.getValueAt(sr, 0).toString().trim();
 				ed.deleteExpert(mf, expertid);
 				JOptionPane.showMessageDialog(mf, "删除成功");
-				expertGroupTableModel.setDataVector(ed.getExpert(mf), cn);
+				expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
 			}
 		});
 		expertGroupTable.addMouseListener(new MouseAdapter() {
@@ -331,8 +367,8 @@ public class ExpertManage {
 				int ebd = expertBurnDate.getText().trim().length();
 				int cee = chooseExpertEducation.getSelectedIndex();
 				int ec = expertCompany.getText().trim().length();
-				int cepr = chooseExpertProfession.getSelectedIndex();
-				int cepo = chooseExpertPosition.getSelectedIndex();
+				int cepr =expertProfessional.getText().trim().length();
+				int cepo = expertOccupation.getText().trim().length();
 				int et = expertTel.getText().trim().length();
 				int ea = expertAddress.getText().trim().length();
 				int cea = chooseExpertArea.getSelectedIndex();
@@ -341,6 +377,8 @@ public class ExpertManage {
 					if (expertNameT.getText().trim().equals("请输入专家姓名")
 							|| expertBurnDate.getText().trim().equals("请输入专家出生日期")
 							|| expertCompany.getText().trim().equals("请输入专家工作单位")
+							||expertProfessional.getText().trim().equals("请输入专家专业领域")
+							||expertOccupation.getText().trim().equals("请输入专家职位")
 							|| expertTel.getText().trim().equals("请输入联系电话")
 							|| expertAddress.getText().trim().equals("请输入联系地址")) {
 						JOptionPane.showMessageDialog(mf, "录入信息不完整");
@@ -359,10 +397,16 @@ public class ExpertManage {
 							ed.insertExpert(mf, professionalgroup[cg - 1][0], expertNameT.getText().trim(),
 									chooseExpertSex.getSelectedItem().toString(), birthday,
 									chooseExpertEducation.getSelectedItem().toString(), expertCompany.getText().trim(),
-									professional[cepr - 1][0], occupation[cepo - 1][0], expertTel.getText().trim(),
+									expertProfessional.getText().trim(), expertOccupation.getText().trim(), expertTel.getText().trim(),
 									chooseExpertArea.getSelectedItem().toString(), expertAddress.getText().trim(),
 									mark);
-							expertGroupTableModel.setDataVector(ed.getExpert(mf), cn);
+							expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
+							chooseExpertGroup.setSelectedIndex(0);expertNameT.setText("请输入专家姓名");
+							chooseExpertSex.setSelectedIndex(0);;expertBurnDate.setText("请输入专家出生日期");
+							chooseExpertEducation.setSelectedIndex(0);expertCompany.setText("请输入专家工作单位");
+							expertProfessional.setText("请输入专家专业领域");expertOccupation.setText("请输入专家职位");
+							expertTel.setText("请输入联系电话");expertAddress.setText("请输入联系地址");
+							expertMark.setText("请输入备注");
 						} catch (Exception e1) {
 							StringWriter sw = new StringWriter();
 							PrintWriter pw = new PrintWriter(sw, true);
@@ -827,7 +871,7 @@ class CheckBoxFrame extends JFrame {
 	}
 
 	public CheckBoxFrame(JFrame f, String[][] ls, DefaultTableModel dm, String[] cn, String expertid, String pg,
-			String name, int x, int y) {
+			String name, int x, int y,String fiftergroup) {
 		int lss = ls.length;
 		this.setTitle("修改" + name + "组别");
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -901,11 +945,11 @@ class CheckBoxFrame extends JFrame {
 					f.setEnabled(true);
 					dispose();
 					f.setEnabled(false);
-					new CheckBoxFrame(f, ls, dm, cn, expertid, pg, name, x, y);
+					new CheckBoxFrame(f, ls, dm, cn, expertid, pg, name, x, y,fiftergroup);
 				} else {
 					ed.editProfessionalGroup(f, str);
 					JOptionPane.showMessageDialog(c, "修改完成");
-					dm.setDataVector(ed.getExpert(f), cn);
+					dm.setDataVector(ed.getExpert(f,fiftergroup), cn);
 					f.setEnabled(true);
 					dispose();
 				}
@@ -917,6 +961,25 @@ class CheckBoxFrame extends JFrame {
 		this.setVisible(true);
 	}
 }
+
+class TableViewRenderer extends JTextArea implements TableCellRenderer { 
+       /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public TableViewRenderer() { 
+            //将表格设为自动换行
+		setLineWrap(true); //利用JTextArea的自动换行方法
+		setAlignmentX((float) 0.5);
+       }
+       public Component getTableCellRendererComponent(JTable jtable, Object obj, //obj指的是单元格内容
+            boolean isSelected, boolean hasFocus, int row, int column) 
+       { 
+       setText(obj == null ? "" : obj.toString()); //利用JTextArea的setText设置文本方法
+       return this; 
+       } 
+    } 
+
 
 class MyFocusListener implements FocusListener {
 	String info;

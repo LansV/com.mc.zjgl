@@ -70,7 +70,7 @@ public class RendomExpertData {
 							+ "left join expert on expert.expertid=expertgroup.expertid "
 							+ "where expertneed.projectid = " + pid + " and expertneed.needgroup=" + group
 							+ " and expert.expertcompany !='" + avoid + "' and "
-							+ "(expertplan.expertplandate is null or expertplan.expertplandate!='" + plandate + "') "
+							+ "(expertplan.expertplandate is null or expertplan.expertplandate !='" + plandate + "') "
 							+ "and expert.expertid  not in ("+existid+")"
 							);
 			int i=1;
