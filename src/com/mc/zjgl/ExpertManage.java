@@ -50,6 +50,9 @@ public class ExpertManage {
 	BasicData bd = new BasicData();
 	ExpertData ed = new ExpertData();
 	String fiftergroup="";
+	DefaultTableModel undm;
+	DefaultTableModel rdm;
+	String[] unfcn={"项目编号","状态"};
 	public ExpertManage(String user) {
 		mf = new JFrame();
 		mf.setTitle("ExpertManage");
@@ -57,13 +60,12 @@ public class ExpertManage {
 		mf.setBounds(10, 10, 1230, 796);
 		mf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container mfc = mf.getContentPane();
-		JPanel pane1 = new JPanel();
 		JTabbedPane MTPane = new JTabbedPane();
 		MTPane.add("基础信息", basicInfo(user));
 		MTPane.add("管理专家", manageExpert());
 		MTPane.add("专家需求", registerProject());
 		MTPane.add("抽选结果", allProject());
-		MTPane.add("系统设置", pane1);
+		MTPane.add("系统设置", sysInfo());
 		mfc.add(MTPane);
 		mf.setVisible(true);
 	}
@@ -736,17 +738,36 @@ public class ExpertManage {
 							String s = expertGroupTable.getValueAt(expertGroupTable.getRowCount() - 1, 1).toString();
 							int cp = Integer.parseInt(s);
 							if (cp > 0) {
-								System.out.println(cp);
+								//System.out.println(cp);
+								ArrayList<String> exportls = new ArrayList<String>();
 								String str = "insert into projectregister values(" + pjId + ",'" + pjNeed + "','"
 										+ pjNeedDate + "','" + pjName + "'," + pjNeedDay + ",'" + pjContact + "'," + "'"
 										+ pjOccupation + "','" + pjTel + "','" + pjMeetPlace + "','" + pjMeetDate
 										+ "','" + pjWork + "','" + pjTraffic + "','" + pjAvoid + "'," + "'" + pjView
 										+ "','" + pjMark + "',0);";
+								exportls.add(pjId);
+								exportls.add(pjNeed);
+								exportls.add(pjName);
+								exportls.add(pjContact);
+								exportls.add(pjOccupation);
+								exportls.add(pjMeetPlace);
+								exportls.add(pjNeedDate);
+								exportls.add(pjNeedDay);
+								exportls.add(pjTel);
+								exportls.add(pjMeetDate);
+								exportls.add(pjWork);
+								exportls.add(pjTraffic);
+								exportls.add(pjView);
+								exportls.add(pjMark);
+								exportls.add(pjAvoid);
 								int rowc = expertGroupTable.getRowCount() - 1;
 								String str2 = "";
+								String[][] exportda=new String[rowc][2];
 								for (int t = 0; t < rowc; t++) {
 									String f = expertGroupTable.getValueAt(t, 0).toString();
 									String se = expertGroupTable.getValueAt(t, 1).toString();
+									exportda[t][0]=f;
+									exportda[t][1]=se;
 									String id = "";
 									for (int tt = 0; tt < pgarrl; tt++) {
 										if (f.equals(pgarr[tt][1])) {
@@ -754,12 +775,18 @@ public class ExpertManage {
 										}
 									}
 									str2 = str2 + "insert into expertneed values(" + pjId + "," + id + "," + se
-											+ ",0);";
+											+ ",0,NULL);";
 								}
 								str = str + str2;
 								int i = rnd.insertProjectRegister(mf, str);
 								if (i == 1) {
-									JOptionPane.showMessageDialog(mf, "登记成功");
+									AllProjectData apd=new AllProjectData();
+									String[][] unfarr=apd.getUnFinishProject(mf);
+									undm.setDataVector(unfarr,unfcn);
+									int bf=JOptionPane.showConfirmDialog(mf,"登记成功\n是否导出excel","选择",JOptionPane.YES_NO_OPTION );
+									if(bf==JOptionPane.YES_OPTION){
+										ExportProject.exportExcel(mf, "text.xls",exportls,exportda);
+									}
 								}
 							} else {
 								JOptionPane.showMessageDialog(mf, "请填写需求人数");
@@ -794,9 +821,8 @@ public class ExpertManage {
 		JTable unFinishTable=new JTable();
 		unFinishTable.setDefaultRenderer(Object.class, tcr);
 		unFinishTable.setRowHeight(20);
-		String[] unfcn={"项目编号","状态"};
 		String[][] unarr=apd.getUnFinishProject(mf);
-		DefaultTableModel undm=new DefaultTableModel(unarr,unfcn){
+		undm=new DefaultTableModel(unarr,unfcn){
 
 			/**
 			 * 
@@ -807,16 +833,7 @@ public class ExpertManage {
 			}
 		};
 		unFinishTable.setModel(undm);
-		unFinishTable.addMouseListener(new MouseAdapter(){
-			public void mousePressed(MouseEvent e){
-				if(e.getClickCount()==2&&e.getButton()==1){
-					int r=unFinishTable.rowAtPoint(e.getPoint());
-					String pid=unFinishTable.getValueAt(r, 0).toString();
-					mf.setEnabled(false);
-					new ShowProjectFrame(mf,pid);
-				}
-			}
-		});
+
 		JPanel unp=new JPanel();
 		unp.setLayout(null);
 		JScrollPane unjsp=new JScrollPane();
@@ -833,9 +850,8 @@ public class ExpertManage {
 		JPanel rbp=new JPanel();
 		rbp.setLayout(null);
 		JScrollPane rjsp=new JScrollPane();
-		String[] rcn={"项目编号","状态"};
-		String[][] rarr={{"",""}};
-		DefaultTableModel rdm=new DefaultTableModel(rarr,rcn){
+		String[][] rarr=apd.getFinishProject(mf);
+		rdm=new DefaultTableModel(rarr,unfcn){
 
 			/**
 			 * 
@@ -854,9 +870,38 @@ public class ExpertManage {
 		rbp.add(rjsp);
 		rp.add(rbp);
 		p.add(rp);
+		unFinishTable.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				if(e.getClickCount()==2&&e.getButton()==1){
+					int r=unFinishTable.rowAtPoint(e.getPoint());
+					String pid=unFinishTable.getValueAt(r, 0).toString();
+					mf.setEnabled(false);
+					new ShowProjectFrame(mf,pid,undm,rdm,unfcn);
+				}
+			}
+		});
+		rtable.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				if(e.getClickCount()==2&&e.getButton()==1){
+					int r=rtable.rowAtPoint(e.getPoint());
+					String pid=rtable.getValueAt(r, 0).toString();
+					mf.setEnabled(false);
+					new ShowResultFrame(mf,pid);
+				}
+			}
+		});
 		return p;
 	}
 	
+
+	public JPanel sysInfo(){
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+		JLabel label=new JLabel("<html>Author：LanLemon..<br>Version：beta.1.0.1<br>User：江门市安全生产管理协会<br>"
+				+ "Service Line：0750-3320133<br>Copyright 2017-2017 江门市明创智能科技有限公司 .All rights reserved.<br>Copyright 2017-2017 LanLemon Studio.All rights reserved.</html>",JLabel.CENTER);
+		p.add(label,BorderLayout.CENTER);
+		return p;
+	}
 }
 
 class CheckBoxFrame extends JFrame {

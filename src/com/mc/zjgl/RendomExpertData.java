@@ -15,7 +15,70 @@ public class RendomExpertData {
 	ResultSet res = null;
 	Dao d = new Dao();
 	Connection con = d.getcon();
+	public String getRendomDate(JFrame f,String pid){
+		String s = null;
+		try {
+			sql = con.createStatement();
+			res =sql.executeQuery("select max(rendomdate) as rd from expertneed where projectid="+pid);
+			while(res.next()){
+				s=res.getString("rd");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return s;
+	}
+	public String[][] getExpertPlan(JFrame f,String pid){
+		ArrayList<String> ls = new ArrayList<String>();
+		
+		try {
+			sql = con.createStatement();
+			res = sql.executeQuery("select*from expertplan where projectid="+pid);
+			while(res.next()){
+				ls.add(res.getString("bh"));
+				ls.add(res.getString("expertid"));
+				ls.add(res.getString("expertgroup"));
+				ls.add(res.getString("expertname"));
+				ls.add(res.getString("professional"));
+				ls.add(res.getString("occupation"));
+				ls.add(res.getString("tel"));
+				ls.add(res.getString("mark"));
+				if(res.getInt("selected")==0){
+					ls.add("未选中");
+				}else{
+					ls.add("已选中");
+				}
+				
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int xl = 9;
+		String[][] data = new String[ls.size() / xl][xl];
+		int count = 0;
+		for (int i = 0; i < ls.size() / xl; i++) { // 行
+			for (int j = 0; j < xl; j++) { // 列
+				data[i][j] = ls.get(j + count * xl);
 
+			}
+			count++;
+		}
+		count = 0;
+		return data;
+	}
+	public int insertExpertPlan(String s){
+		int i=0;
+		try {
+			sql = con.createStatement();
+			sql.execute(s);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return i;
+	}
 	public String[][] getNeed(String pid) {
 		ArrayList<String> ls = new ArrayList<String>();
 		try {

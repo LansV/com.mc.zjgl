@@ -6,11 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -31,6 +33,8 @@ public class RendomExpert extends JFrame {
 	 */
 
 	public RendomExpert(JFrame f, String pid, String name, String work, String meetdate) {
+		RendomExpertData red = new RendomExpertData();
+		JFrame ft=this;
 		this.setResizable(false);
 		this.setTitle("专家抽选");
 		this.setBounds(300, 70, 600, 750);
@@ -132,6 +136,7 @@ public class RendomExpert extends JFrame {
 				int cr = fr.getRowCount();
 				System.out.println(cr);
 				String sqlex="";
+				String[][] expa=new String[cr][4];
 				for (int i = 0; i < cr; i++) {
 					int b=0;
 					if((boolean) fr.getValueAt(i, 8)){
@@ -147,13 +152,29 @@ public class RendomExpert extends JFrame {
 							}
 						}
 					}*/
+					expa[i][0]=fr.getValueAt(i, 0).toString();
+					expa[i][1]=fr.getValueAt(i, 2).toString();
+					expa[i][2]=fr.getValueAt(i, 3).toString();
+					expa[i][3]=fr.getValueAt(i, 6).toString();
 				    sqlex=sqlex+"insert into expertplan values("
 				    	+ ""+pid+","+fr.getValueAt(i, 0).toString()+","+fr.getValueAt(i, 1).toString()+","
 				    	+ "'"+fr.getValueAt(i, 2).toString()+"','"+fr.getValueAt(i, 3).toString()+"','"+fr.getValueAt(i, 4).toString()+"',"
 				    	+ "'"+fr.getValueAt(i, 5).toString()+"','"+fr.getValueAt(i, 6)+"',"
 				    	+ "'"+fr.getValueAt(i, 7).toString()+"',"+b+",'"+meetdate+"');"+"\n";
 				}
-				System.out.println(sqlex);
+				sqlex=sqlex+"update expertneed set needstatus = 1,rendomdate='"+s+"' where projectid="+pid;
+				red.insertExpertPlan(sqlex);
+				int bf=JOptionPane.showConfirmDialog(ft,"登记成功\n是否导出excel","选择",JOptionPane.YES_NO_OPTION );
+				if(bf==JOptionPane.YES_OPTION){
+				   ArrayList<String> ls = new ArrayList<String>();
+				   ls.add(name);
+				   ls.add(pid);
+				   ls.add(work);
+				   ls.add(s);
+				   ExportRendom.exportExcel(ft, "test.xls",ls, expa);
+				}
+				b.setEnabled(false);
+				//System.out.println(sqlex);
 			}
 		});
 		b.setBounds(250, 360, 80, 24);

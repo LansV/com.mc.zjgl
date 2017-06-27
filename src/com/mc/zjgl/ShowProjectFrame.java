@@ -37,12 +37,17 @@ public class ShowProjectFrame extends JFrame{
 	public ShowProjectFrame(){
 		
 	}
-	public ShowProjectFrame(JFrame f,String pid){
+	public ShowProjectFrame(JFrame f,String pid,DefaultTableModel dm,DefaultTableModel dm2,String[] cn){
+		AllProjectData apd=new AllProjectData();
 		this.setResizable(false);
 		this.setTitle("项目信息");
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
+				String[][] unarr=apd.getUnFinishProject(f);
+				String[][] unarr2=apd.getFinishProject(f);
+				dm.setDataVector(unarr, cn);
+				dm2.setDataVector(unarr2, cn);
 				f.setEnabled(true);
 				dispose();
 			}
@@ -352,6 +357,56 @@ public class ShowProjectFrame extends JFrame{
 			}
 		});
 		register.setBounds(550, 680, 80, 25);
+		JButton exportb=new JButton("导出");
+		exportb.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String pjId = projectId.getText().trim();
+				String pjNeed = projectNeedT.getText().trim();
+				String pjNeedDate = projectDateT.getText().trim();
+				String pjName = projectNameT.getText().trim();
+				String pjNeedDay = projectDateT1.getText().trim();
+				String pjContact = projectContactT.getText().trim();
+				String pjOccupation = chooseExpertPosition.getSelectedItem().toString().trim();
+				String pjTel = projectTelT.getText().trim();
+				String pjMeetPlace = projectMeetPlaceT.getText().trim();
+				String pjMeetDate = projectMeetDateT.getText().trim();
+				String pjWork = projectWorkT.getText().trim();
+				String pjTraffic = projectTraficT.getText().trim();
+				String pjAvoid = avoidC.getSelectedItem().toString().trim();
+				String pjView = projectViewT.getText().trim();
+				String pjMark = projectMarkT.getText().trim();
+				ArrayList<String> exportls = new ArrayList<String>();
+				exportls.add(pjId);
+				exportls.add(pjNeed);
+				exportls.add(pjName);
+				exportls.add(pjContact);
+				exportls.add(pjOccupation);
+				exportls.add(pjMeetPlace);
+				exportls.add(pjNeedDate);
+				exportls.add(pjNeedDay);
+				exportls.add(pjTel);
+				exportls.add(pjMeetDate);
+				exportls.add(pjWork);
+				exportls.add(pjTraffic);
+				exportls.add(pjView);
+				exportls.add(pjMark);
+				exportls.add(pjAvoid);
+				int rowc = expertGroupTable.getRowCount() - 1;
+				String[][] exportda=new String[rowc][2];
+				for (int t = 0; t < rowc; t++) {
+					String f = expertGroupTable.getValueAt(t, 0).toString();
+					String se = expertGroupTable.getValueAt(t, 1).toString();
+					exportda[t][0]=f;
+					exportda[t][1]=se;
+				}
+				ExportProject.exportExcel(f, "text.xls",exportls,exportda);
+			}
+		});
+		exportb.setBounds(650, 680, 80, 25);
+		p.add(exportb);
 		p.add(register);
 		return p;
 	}
