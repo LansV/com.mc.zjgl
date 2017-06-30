@@ -32,7 +32,7 @@ public class RendomExpert extends JFrame {
 	 * RendomExpert(f); }
 	 */
 
-	public RendomExpert(JFrame f, String pid, String name, String work, String meetdate) {
+	public RendomExpert(JFrame f, String pid, String name, String work, String meetdate,String need,String contact,String user) {
 		RendomExpertData red = new RendomExpertData();
 		JFrame ft=this;
 		this.setResizable(false);
@@ -79,12 +79,14 @@ public class RendomExpert extends JFrame {
 		c.add(needl);
 		JTextField needt = new JTextField();
 		needt.setBounds(405, 40, 150, 20);
+		needt.setText(need);
 		c.add(needt);
 		JLabel drawl = new JLabel("抽签人:");
 		drawl.setBounds(360, 80, 80, 20);
 		c.add(drawl);
 		JTextField drawt = new JTextField();
 		drawt.setBounds(405, 80, 150, 20);
+		drawt.setText(contact);
 		c.add(drawt);
 		JLabel supervisorl = new JLabel("监督人:");
 		supervisorl.setBounds(360, 120, 80, 20);
@@ -141,6 +143,10 @@ public class RendomExpert extends JFrame {
 					int b=0;
 					if((boolean) fr.getValueAt(i, 8)){
 						b=1;
+						expa[i][0]=fr.getValueAt(i, 0).toString();
+						expa[i][1]=fr.getValueAt(i, 2).toString();
+						expa[i][2]=fr.getValueAt(i, 3).toString();
+						expa[i][3]=fr.getValueAt(i, 6).toString();
 					}
 					//sqlex=sqlex+"insert into expertplan values("+pid+",";
 /*					for(int j=0;j<10;j++){
@@ -152,17 +158,14 @@ public class RendomExpert extends JFrame {
 							}
 						}
 					}*/
-					expa[i][0]=fr.getValueAt(i, 0).toString();
-					expa[i][1]=fr.getValueAt(i, 2).toString();
-					expa[i][2]=fr.getValueAt(i, 3).toString();
-					expa[i][3]=fr.getValueAt(i, 6).toString();
+					
 				    sqlex=sqlex+"insert into expertplan values("
 				    	+ ""+pid+","+fr.getValueAt(i, 0).toString()+","+fr.getValueAt(i, 1).toString()+","
 				    	+ "'"+fr.getValueAt(i, 2).toString()+"','"+fr.getValueAt(i, 3).toString()+"','"+fr.getValueAt(i, 4).toString()+"',"
 				    	+ "'"+fr.getValueAt(i, 5).toString()+"','"+fr.getValueAt(i, 6)+"',"
-				    	+ "'"+fr.getValueAt(i, 7).toString()+"',"+b+",'"+meetdate+"');"+"\n";
+				    	+ "'"+fr.getValueAt(i, 7).toString()+"',"+b+",'"+meetdate+"','"+user+"');"+"\n";
 				}
-				sqlex=sqlex+"update expertneed set needstatus = 1,rendomdate='"+s+"' where projectid="+pid;
+				sqlex=sqlex+"update expertneed set needstatus = 1,rendomdate='"+s+"',operator='"+user+"' where projectid="+pid;
 				red.insertExpertPlan(sqlex);
 				int bf=JOptionPane.showConfirmDialog(ft,"登记成功\n是否导出excel","选择",JOptionPane.YES_NO_OPTION );
 				if(bf==JOptionPane.YES_OPTION){
@@ -171,7 +174,7 @@ public class RendomExpert extends JFrame {
 				   ls.add(pid);
 				   ls.add(work);
 				   ls.add(s);
-				   ExportRendom.exportExcel(ft, "test.xls",ls, expa);
+				   ExportRendom.exportExcel(ft, pid+ "抽选单.xls",ls, expa);
 				}
 				b.setEnabled(false);
 				//System.out.println(sqlex);

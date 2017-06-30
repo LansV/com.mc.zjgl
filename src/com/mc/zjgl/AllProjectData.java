@@ -132,7 +132,7 @@ public class AllProjectData {
 			while(res.next()){
 				ls.add(res.getString("projectid"));
 				if(res.getInt("ns")==1){
-					ls.add("已抽选");
+					ls.add("未确认");
 				}else{
 					ls.add("错误");
 				}

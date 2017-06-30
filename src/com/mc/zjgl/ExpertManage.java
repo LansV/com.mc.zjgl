@@ -53,7 +53,7 @@ public class ExpertManage {
 	DefaultTableModel undm;
 	DefaultTableModel rdm;
 	String[] unfcn={"项目编号","状态"};
-	public ExpertManage(String user) {
+	public ExpertManage(String user,int qx) {
 		mf = new JFrame();
 		mf.setTitle("ExpertManage");
 		mf.setResizable(false);
@@ -62,15 +62,15 @@ public class ExpertManage {
 		Container mfc = mf.getContentPane();
 		JTabbedPane MTPane = new JTabbedPane();
 		MTPane.add("基础信息", basicInfo(user));
-		MTPane.add("管理专家", manageExpert());
-		MTPane.add("专家需求", registerProject());
-		MTPane.add("抽选结果", allProject());
+		MTPane.add("管理专家", manageExpert(user,qx));
+		MTPane.add("专家需求", registerProject(user));
+		MTPane.add("抽选结果", allProject(user));
 		MTPane.add("系统设置", sysInfo());
 		mfc.add(MTPane);
 		mf.setVisible(true);
 	}
 	public static void main(String[] args) {
-		new ExpertManage("test");
+		new ExpertManage("tt",1);
 	}
 
 	public JPanel basicInfo(String user) {
@@ -130,10 +130,10 @@ public class ExpertManage {
 		expertGroupJSP.setBounds(30, 165, 200, 550);
 		p.add(expertGroupJSP);
 		// -----------------------------------------------------------------------
-		JLabel expertGT1 = new JLabel("请填写专业领域", JLabel.CENTER);
+		JLabel expertGT1 = new JLabel("待添加...", JLabel.CENTER);
 		expertGT1.setBounds(300, 60, 200, 25);
 		p.add(expertGT1);
-		JTextField expertGroup1 = new JTextField();
+/*		JTextField expertGroup1 = new JTextField();
 		expertGroup1.setBounds(300, 90, 200, 25);
 		p.add(expertGroup1);
 		JButton addExpertGroup1 = new JButton("添加专业");
@@ -174,7 +174,7 @@ public class ExpertManage {
 		expertGroupTable1.setRowHeight(22);
 		expertGroupJSP1.setViewportView(expertGroupTable1);
 		expertGroupJSP1.setBounds(300, 165, 200, 550);
-		p.add(expertGroupJSP1);
+		p.add(expertGroupJSP1);*/
 		// -----------------------------------------------------------
 		JLabel expertGT11 = new JLabel("待添加...", JLabel.CENTER);
 		expertGT11.setBounds(600, 60, 200, 25);
@@ -186,7 +186,7 @@ public class ExpertManage {
 		return p;
 	}
 
-	public JPanel manageExpert() {
+	public JPanel manageExpert(String user,int qx) {
 		String[][] professionalgroup = bd.getGroup(mf);
 		String[][] sex = bd.getSex(mf);
 		String[][] education = bd.getEducation(mf);
@@ -288,11 +288,22 @@ public class ExpertManage {
 		fifterGroup.setBounds(30, 180, 120, 25);
 		p.add(fifterGroup);
 		JScrollPane expertGroupJSP = new JScrollPane();
-		String[] cn = { "ID", "专业组别", "姓名", "性别", "出生年月", "学历", "工作单位", "专业领域", "职称/职位", "联系电话", "区域", "通讯地址", "备注" };
+		String[] cn = { "ID", "专业组别", "姓名", "性别", "出生年月","年龄", "学历", "工作单位", "专业领域", "职称/职位", "联系电话", "区域", "通讯地址", "备注" };
 		String[][] arr = ed.getExpert(mf,fiftergroup);
 		JTable expertGroupTable = new JTable();
-		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn);
+		DefaultTableModel expertGroupTableModel = new DefaultTableModel(arr, cn){
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+			
+		};
 		JPopupMenu editRight = new JPopupMenu();
+
 		JMenuItem edit = new JMenuItem("编辑");
 		JMenuItem delete = new JMenuItem("删除");
 		edit.addActionListener(new ActionListener() {
@@ -343,7 +354,7 @@ public class ExpertManage {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO 自动生成的方法存根
-				if (e.getButton() == 3) {
+				if (e.getButton() == 3&&qx>3) {
 					int sr = expertGroupTable.rowAtPoint(e.getPoint());
 					expertGroupTable.setRowSelectionInterval(sr, sr);
 					editRight.show(expertGroupTable, e.getX(), e.getY());
@@ -401,7 +412,7 @@ public class ExpertManage {
 									chooseExpertEducation.getSelectedItem().toString(), expertCompany.getText().trim(),
 									expertProfessional.getText().trim(), expertOccupation.getText().trim(), expertTel.getText().trim(),
 									chooseExpertArea.getSelectedItem().toString(), expertAddress.getText().trim(),
-									mark);
+									mark,user);
 							expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
 							chooseExpertGroup.setSelectedIndex(0);expertNameT.setText("请输入专家姓名");
 							chooseExpertSex.setSelectedIndex(0);;expertBurnDate.setText("请输入专家出生日期");
@@ -429,7 +440,7 @@ public class ExpertManage {
 		return p;
 	}
 
-	public JPanel registerProject() {
+	public JPanel registerProject(String user) {
 		RegisterNeedExpertData rnd = new RegisterNeedExpertData();
 		CheckFormat cf = new CheckFormat();
 		JPanel p = new JPanel();
@@ -744,7 +755,7 @@ public class ExpertManage {
 										+ pjNeedDate + "','" + pjName + "'," + pjNeedDay + ",'" + pjContact + "'," + "'"
 										+ pjOccupation + "','" + pjTel + "','" + pjMeetPlace + "','" + pjMeetDate
 										+ "','" + pjWork + "','" + pjTraffic + "','" + pjAvoid + "'," + "'" + pjView
-										+ "','" + pjMark + "',0);";
+										+ "','" + pjMark + "',0,'"+user+"');";
 								exportls.add(pjId);
 								exportls.add(pjNeed);
 								exportls.add(pjName);
@@ -775,7 +786,7 @@ public class ExpertManage {
 										}
 									}
 									str2 = str2 + "insert into expertneed values(" + pjId + "," + id + "," + se
-											+ ",0,NULL);";
+											+ ",0,NULL,'"+user+"');";
 								}
 								str = str + str2;
 								int i = rnd.insertProjectRegister(mf, str);
@@ -785,7 +796,7 @@ public class ExpertManage {
 									undm.setDataVector(unfarr,unfcn);
 									int bf=JOptionPane.showConfirmDialog(mf,"登记成功\n是否导出excel","选择",JOptionPane.YES_NO_OPTION );
 									if(bf==JOptionPane.YES_OPTION){
-										ExportProject.exportExcel(mf, "text.xls",exportls,exportda);
+										ExportProject.exportExcel(mf, pjId+ "需求单.xls",exportls,exportda);
 									}
 								}
 							} else {
@@ -806,7 +817,7 @@ public class ExpertManage {
 		p.add(register);
 		return p;
 	}
-	public JPanel allProject(){
+	public JPanel allProject(String user){
 		AllProjectData apd=new AllProjectData();
 		JPanel p=new JPanel();
 		p.setLayout(new GridLayout(1,2,5,5));
@@ -876,7 +887,7 @@ public class ExpertManage {
 					int r=unFinishTable.rowAtPoint(e.getPoint());
 					String pid=unFinishTable.getValueAt(r, 0).toString();
 					mf.setEnabled(false);
-					new ShowProjectFrame(mf,pid,undm,rdm,unfcn);
+					new ShowProjectFrame(mf,pid,undm,rdm,unfcn,user);
 				}
 			}
 		});
@@ -886,7 +897,7 @@ public class ExpertManage {
 					int r=rtable.rowAtPoint(e.getPoint());
 					String pid=rtable.getValueAt(r, 0).toString();
 					mf.setEnabled(false);
-					new ShowResultFrame(mf,pid);
+					new ShowResultFrame(mf,pid,user);
 				}
 			}
 		});
@@ -894,6 +905,7 @@ public class ExpertManage {
 	}
 	
 
+	
 	public JPanel sysInfo(){
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());

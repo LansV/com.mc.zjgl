@@ -37,7 +37,7 @@ public class ShowResultFrame extends JFrame{
 	public ShowResultFrame(){
 		
 	}
-	public ShowResultFrame(JFrame f,String pid){
+	public ShowResultFrame(JFrame f,String pid,String user){
 		this.setResizable(false);
 		this.setTitle("项目信息");
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -49,10 +49,10 @@ public class ShowResultFrame extends JFrame{
 			}
 		});
 		this.setBounds(150,40,1140,750);
-		this.add(registerProject(this,pid));
+		this.add(registerProject(this,pid,user));
 		this.setVisible(true);
 	}
-	public JPanel registerProject(JFrame f,String pid) {
+	public JPanel registerProject(JFrame f,String pid,String user) {
 		//RegisterNeedExpertData rnd = new RegisterNeedExpertData();
 		AllProjectData apd=new AllProjectData();
 		ArrayList<String> ls = apd.getProjectInfo(f, pid);
@@ -348,8 +348,10 @@ public class ShowResultFrame extends JFrame{
 				String work=projectWorkT.getText();
 				String meetdate=projectMeetDateT.getText();
 				String name=projectNameT.getText();
+				String need=projectNeedT.getText();
+				String contact=projectContactT.getText();
 				f.setEnabled(false);
-				new ShowRendomExpert(f,pid, name, work, meetdate);
+				new ShowRendomExpert(f,pid, name, work, meetdate,need,contact,user);
 			}
 		});
 		register.setBounds(550, 680, 80, 25);
@@ -398,7 +400,7 @@ public class ShowResultFrame extends JFrame{
 					exportda[t][0]=f;
 					exportda[t][1]=se;
 				}
-				ExportProject.exportExcel(f, "text.xls",exportls,exportda);
+				ExportProject.exportExcel(f,pid+ "需求单.xls",exportls,exportda);
 			}
 		});
 		exportb.setBounds(650, 680, 80, 25);

@@ -13,9 +13,10 @@ import javax.swing.JOptionPane;
 
 public class ServerIP {
 	static FileOutputStream out = null;
+	static String filename="config/config.inf";
 	public static ArrayList<String> getServerInfo(JFrame JOP){
 		ArrayList<String> ls = new ArrayList<String>();
-		File file = new File("i:/test.inf");
+		File file = new File(filename);
 		if (file.exists() == true) {
 			InputStream in = null;
 			try {
@@ -63,7 +64,7 @@ public class ServerIP {
 		return ls;
 	}
 	public static boolean writeSeverIP(JFrame JOP,String info) {
-		File file = new File("i:/test.inf");
+		File file = new File(filename);
 		if (file.exists() == true) {
 			try {
 				out = new FileOutputStream(file);

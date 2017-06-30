@@ -176,12 +176,13 @@ public class Login extends JFrame {
 								Dao d = new Dao();
 								System.out.println("d");
 								Connection con = d.getcon();
-						/*		Statement sql = con.createStatement();
+								Statement sql = con.createStatement();
 								ResultSet res = sql.executeQuery("select*from UserB where username='" + user + "'");
 								if (res.next()) {
 									String xuser = res.getString("username").trim();
 									String xpass = res.getString("pass").trim();
-									int id = res.getInt("id");
+									int id = res.getInt("uid");
+									int qx=res.getInt("qx");
 									if (user.equals(xuser) && pass.equals(xpass)) {
 										if (xpass.equals("123456")) {
 											JOptionPane.showMessageDialog(c, "\t≥ı º√‹¬Î\n«Î–ﬁ∏ƒ√‹¬Î");
@@ -192,7 +193,7 @@ public class Login extends JFrame {
 												sql.execute("insert into LoginLog(UserId,Pc_name,Pc_Mac) values(" + id
 														+ ",'" + PcName + "','" + PcMac + "')");
 												dispose();
-												
+												new ExpertManage(user,qx);
 											}
 										}
 									} else {
@@ -205,7 +206,7 @@ public class Login extends JFrame {
 									JT_user.setText("");
 									JT_pass.setText("");
 									JT_user.requestFocus();
-								}*/
+								}
 							}else{
 								JOptionPane.showMessageDialog(c, "IP”–ŒÛ");
 								serveripT.requestFocus();

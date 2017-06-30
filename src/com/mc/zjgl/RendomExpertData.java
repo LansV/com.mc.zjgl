@@ -255,6 +255,50 @@ public class RendomExpertData {
 		}
 		return data;
 	}
+	public Object[][] getShowRendomResult(JFrame f,String pid) {
+		ArrayList<Object> ls = new ArrayList<Object>();
+		try {
+			sql = con.createStatement();
+			res = sql.executeQuery("select*from expertplan where projectid="+pid);
+			while(res.next()){
+				ls.add(res.getString("bh"));
+				ls.add(res.getString("expertid"));
+				ls.add(res.getString("expertgroup"));
+				ls.add(res.getString("expertname"));
+				ls.add(res.getString("professional"));
+				ls.add(res.getString("occupation"));
+				ls.add(res.getString("tel"));
+				ls.add(res.getString("mark"));
+				if(res.getInt("selected")==0){
+					ls.add(false);
+				}else{
+					ls.add(true);
+				}
+				
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int xl = 9;
+		int resl = ls.size() / xl;
+		Object[][] data = new Object[resl][xl];
+		int count = 0;
+		for (int i = 0; i < resl; i++) { // ÐÐ
+			for (int j = 0; j < xl; j++) { // ÁÐ
+				data[i][j] = ls.get(j + count * xl);
+			}
+			count++;
+		}
+		count = 0;
+//		for (Object[] i : data) {
+//			for (Object t : i) {
+//				System.out.print(t + "  ");
+//			}
+//			System.out.println();
+//		}
+		return data;
+	}
 
 /*	public static void main(String[] args) {
 

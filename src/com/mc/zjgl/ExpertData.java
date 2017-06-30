@@ -18,7 +18,7 @@ public class ExpertData {
    	Dao d=new Dao();
 	Connection con = d.getcon();
 	public int insertExpert(JFrame f,String pgid,String en,String es,String ebd,String educ,String ec,String prof,String occup,
-			String tel,String area,String address,String mark){
+			String tel,String area,String address,String mark,String user){
 		int i=0;
 		String id="";
 		try {
@@ -37,7 +37,7 @@ public class ExpertData {
 					id=Integer.toString(maxid);
 				}
 				String sqlstr="insert into expert values ("+id+",'"+en+"','"+es+"','"+ebd+"','"+educ+"','"+ec+"',"
-						+ "'"+prof+"','"+occup+"','"+tel+"','"+area+"','"+address+"','"+mark+"');"
+						+ "'"+prof+"','"+occup+"','"+tel+"','"+area+"','"+address+"','"+mark+"','"+user+"');"
 								+ "insert into expertgroup values("+id+","+pgid+")";
 				System.out.println(sqlstr);
 				sql.execute(sqlstr);
@@ -74,12 +74,14 @@ public class ExpertData {
 					+ " )  b "
 					+ " WHERE expertid = A.expertid  for xml path('')),1,1,'')"
 					+ "),MAX(expertname) as expertname ,MAX(expertsex) as expertsex,MAX(expertburndate) as expertburndate,"
+					+ "max(age) as age,"
 					+ "max(education) as education,MAX(expertcompany) as expertcompany,MAX(professional) as professionalname,"
 					+ "MAX(occupation) as occupationname,MAX(tel) as tel,MAX(area) as area,MAX(address) as address,"
 					+ "MAX(mark) as  mark"
 					+ " from "
 					+ "("
-					+ "select expert.expertid,professionalgroupname,expertname,expertsex,expertburndate,education,"
+					+ "select expert.expertid,professionalgroupname,expertname,expertsex,expertburndate,"
+					+ "DATEDIFF(YEAR,expertburndate,convert(char(10),getdate(),120)) as age,education,"
 					+ "expertcompany,expert.professional,expert.occupation,tel,area,address,mark from "
 					+ " expert"
 					+ " inner join expertgroup on expert.expertid=expertgroup.expertid"
@@ -93,6 +95,7 @@ public class ExpertData {
 				ls.add(res.getString("expertname"));
 				ls.add(res.getString("expertsex"));
 				ls.add(res.getString("expertburndate"));
+				ls.add(res.getString("age"));
 				ls.add(res.getString("education"));
 				ls.add(res.getString("expertcompany"));
 				ls.add(res.getString("professionalname"));
@@ -113,7 +116,7 @@ public class ExpertData {
 			Rectangle b = f.getBounds();
 			new ErrorDialog(f, b, errorString);
 		}
-		int xl=13;
+		int xl=14;
 		String[][] data=new String[ls.size()/xl][xl];
 	   	int count=0;
 	   	for(int i=0;i<ls.size()/xl;i++){  //ÐÐ
