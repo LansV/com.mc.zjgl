@@ -332,7 +332,7 @@ public class ExpertManage {
 						fiftergroup="";
 						expertGroupTableModel.setDataVector(ed.getExpert(mf,fiftergroup), cn);
 					}
-					System.out.println("change");
+					//System.out.println("change");
 				}
 			}
 			
