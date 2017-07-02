@@ -28,7 +28,11 @@ public class CountExpertData {
 					+ "where selected=1 and expertid="+id+" and needstatus=2");
 			while(res.next()){
 				ls.add(res.getString("id"));
-				ls.add(res.getString("nstatus"));
+				if(res.getInt("nstatus")==2){
+					ls.add("ÒÑÈ·ÈÏ");
+				}else{
+					ls.add("´íÎó");
+				}
 			}
 		}catch(SQLException e){
 			StringWriter sw = new StringWriter();

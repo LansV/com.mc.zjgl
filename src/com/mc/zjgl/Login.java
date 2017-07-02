@@ -188,7 +188,6 @@ public class Login extends JFrame {
 											JOptionPane.showMessageDialog(c, "\t≥ı º√‹¬Î\n«Î–ﬁ∏ƒ√‹¬Î");
 											changePassW.setVisible(true);
 										} else {
-											
 											if (CheckDate.ReturnCheckDateResult(JB_login) == true) {
 												sql.execute("insert into LoginLog(UserId,Pc_name,Pc_Mac) values(" + id
 														+ ",'" + PcName + "','" + PcMac + "')");
