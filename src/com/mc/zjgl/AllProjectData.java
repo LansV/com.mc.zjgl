@@ -16,6 +16,14 @@ public class AllProjectData {
    	ResultSet res=null;
    	Dao d=new Dao();
 	Connection con = d.getcon();
+	public void updateStatus(String s){
+		try{
+			sql=con.createStatement();
+			sql.executeQuery(s);
+		}catch(SQLException e){
+			
+		}
+	}
 	public String[][] getExpertNeed(JFrame f,String pid){
 		ArrayList<String> ls = new ArrayList<String>();
 		try{

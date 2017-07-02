@@ -30,7 +30,7 @@ public class ShowRendomExpert extends JFrame {
 	 * RendomExpert(f); }
 	 */
 
-	public ShowRendomExpert(JFrame f, String pid, String name, String work, String meetdate,String need,String contact,String user) {
+	public ShowRendomExpert(JFrame f, String pid, String name, String work, String meetdate,String need,String contact,String user,int zt) {
 		RendomExpertData red = new RendomExpertData();
 		JFrame ft=this;
 		this.setResizable(false);
@@ -127,6 +127,11 @@ public class ShowRendomExpert extends JFrame {
 		fjsp.setBounds(10, 40, 570, 300);
 		bp.add(fjsp);
 		JButton b = new JButton("ÐÞ¸Ä");
+		if(zt==0){
+			b.setVisible(true);
+		}else{
+			b.setVisible(false);
+		}
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

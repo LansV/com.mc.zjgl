@@ -5,7 +5,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,6 +68,7 @@ public class ExpertManage {
 		MTPane.add("管理专家", manageExpert(user,qx));
 		MTPane.add("专家需求", registerProject(user));
 		MTPane.add("抽选结果", allProject(user));
+		MTPane.add("次数统计", countExpert(user));
 		MTPane.add("系统设置", sysInfo());
 		mfc.add(MTPane);
 		mf.setVisible(true);
@@ -786,7 +790,7 @@ public class ExpertManage {
 										}
 									}
 									str2 = str2 + "insert into expertneed values(" + pjId + "," + id + "," + se
-											+ ",0,NULL,'"+user+"');";
+											+ ",0,NULL,'"+user+"',NULL);";
 								}
 								str = str + str2;
 								int i = rnd.insertProjectRegister(mf, str);
@@ -891,20 +895,181 @@ public class ExpertManage {
 				}
 			}
 		});
+		JPopupMenu pm=new JPopupMenu();
+		JMenuItem enter=new JMenuItem("确认结束");
+		pm.add(enter);
 		rtable.addMouseListener(new MouseAdapter(){
 			public void mousePressed(MouseEvent e){
 				if(e.getClickCount()==2&&e.getButton()==1){
 					int r=rtable.rowAtPoint(e.getPoint());
 					String pid=rtable.getValueAt(r, 0).toString();
 					mf.setEnabled(false);
-					new ShowResultFrame(mf,pid,user);
+					new ShowResultFrame(mf,pid,user,0);
+				}
+				if(e.getButton()==3){
+					int r=rtable.rowAtPoint(e.getPoint());
+					rtable.setRowSelectionInterval(r, r);
+					pm.show(rtable, e.getX(), e.getY());
 				}
 			}
+		});
+		enter.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int r=rtable.getSelectedRow();
+				String pid=rtable.getValueAt(r, 0).toString();
+				String s="update expertneed set needstatus=2,comfirmer='"+user+"' where projectid="+pid;
+				apd.updateStatus(s);
+				rdm.setDataVector(apd.getFinishProject(mf), unfcn);
+			}
+			
 		});
 		return p;
 	}
 	
+	public JPanel countExpert(String user){
+		CountExpertData ced=new CountExpertData();
+		JPanel p = new JPanel();
+		JPanel lp = new JPanel();
+		JPanel rp = new JPanel();
+		p.setLayout(new GridLayout(1,2));
+		lp.setLayout(new GridLayout(1,1));
+		JPanel llp = new JPanel();
+		llp.setLayout(new BorderLayout());
+		JPanel lltop = new JPanel();
+		lltop.setLayout(new GridBagLayout());
+		GridBagConstraints gbc1 = new GridBagConstraints();
+		gbc1.gridx=0;
+		gbc1.gridy=0;
+		gbc1.weightx=5;
+		gbc1.fill = GridBagConstraints.HORIZONTAL;
+		//gbc1.gridwidth=1;
+		JTextField jname=new JTextField();
+		jname.setText("查询专家名");
+		jname.addFocusListener(new MyFocusListener("查询专家名", jname));
+		lltop.add(jname, gbc1);
+		JTextField date1=new JTextField();
+		JLabel lb=new JLabel("—");
+		GridBagConstraints gbc4 = new GridBagConstraints();
+		gbc4.gridx=2;
+		gbc4.gridy=0;
+		gbc4.weightx=0.1;
+		gbc4.insets = new Insets(0, 3, 0, 0);  
+		gbc4.fill = GridBagConstraints.HORIZONTAL;
+		lltop.add(lb, gbc4);
+		JTextField date2=new JTextField();
+		date1.setText("起始日期");
+		date1.addFocusListener(new MyFocusListener("起始日期", date1));
+		date2.setText("结束日期");
+		date2.addFocusListener(new MyFocusListener("结束日期", date2));
+		GridBagConstraints gbc2 = new GridBagConstraints();
+		gbc2.gridx=1;
+		gbc2.gridy=0;
+		gbc2.weightx=5;
+		gbc2.insets = new Insets(0, 15, 0, 0);      
+		gbc2.fill = GridBagConstraints.HORIZONTAL;
+		GridBagConstraints gbc3 = new GridBagConstraints();
+		gbc3.gridx=3;
+		gbc3.gridy=0;
+		gbc3.weightx=5;
+		gbc3.fill = GridBagConstraints.HORIZONTAL;
+		lltop.add(date1, gbc2);
+		lltop.add(date2, gbc3);
+		JButton cx=new JButton("查询");
+		GridBagConstraints gbc5 = new GridBagConstraints();
+		gbc5.gridx=4;
+		gbc5.gridy=0;
+		gbc5.insets = new Insets(0, 5, 0, 0);  
+		//gbc5.weightx=5;
+		//gbc5.fill = GridBagConstraints.HORIZONTAL;
+		lltop.add(cx, gbc5);
+		JScrollPane jsp=new JScrollPane();
+		JTable jt=new JTable();
+		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
+		tcr.setHorizontalAlignment(JLabel.CENTER);
+		String[] cn={"编号","名称","次数"};
+		String[][] arr=ced.getExpert(mf,"","","");
+		DefaultTableModel dm=new DefaultTableModel(arr,cn){
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+		};
+		jt.setModel(dm);
+		jt.setDefaultRenderer(Object.class, tcr);
+		jt.setRowHeight(20);
+		jsp.setViewportView(jt);;
+		llp.add("North",lltop);
+		llp.add(jsp);
+		lp.add(llp);
+		JScrollPane rjsp=new JScrollPane();
+		String[][] rarr={};
+		rdm=new DefaultTableModel(rarr,unfcn){
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+		};
+		JTable rtable=new JTable();
+		rtable.setRowHeight(20);
+		rtable.setModel(rdm);
+		rtable.setDefaultRenderer(Object.class, tcr);
+		rtable.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				if(e.getClickCount()==2&&e.getButton()==1){
+					int r=rtable.rowAtPoint(e.getPoint());
+					String pid=rtable.getValueAt(r, 0).toString();
+					mf.setEnabled(false);
+					new ShowResultFrame(mf,pid,user,1);
+				}
+			}
+		});
+		rjsp.setViewportView(rtable);
+		rp.setLayout(new GridLayout(0,1));
+		rp.add(rjsp);
+		p.add(lp);
+		p.add(rp);
+		jt.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				if(e.getButton()==1&&e.getClickCount()==2){
+					int r=jt.getSelectedRow();
+					String id=jt.getValueAt(r, 0).toString();
+					rdm.setDataVector(ced.getProject(mf, id), unfcn);
+				}
+			}
+		});
+		cx.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String name=jname.getText().trim();
+				String sdate1=date1.getText().trim();
+				String sdate2=date2.getText().trim();
+				
+				if(name.equals("查询专家名")){
+					name="";
+				}
+				if(sdate1.equals("起始日期")){
+					sdate1="";
+					//b1=true;
+				}
+				if(sdate2.equals("结束日期")){
+					sdate2="";
+				}
+				dm.setDataVector(ced.getExpert(mf,name,sdate1,sdate2), cn);
+			}
+		});
+		return p;
+	}
 	
 	public JPanel sysInfo(){
 		JPanel p = new JPanel();

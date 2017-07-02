@@ -37,7 +37,7 @@ public class ShowResultFrame extends JFrame{
 	public ShowResultFrame(){
 		
 	}
-	public ShowResultFrame(JFrame f,String pid,String user){
+	public ShowResultFrame(JFrame f,String pid,String user,int zt){
 		this.setResizable(false);
 		this.setTitle("项目信息");
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -49,10 +49,10 @@ public class ShowResultFrame extends JFrame{
 			}
 		});
 		this.setBounds(150,40,1140,750);
-		this.add(registerProject(this,pid,user));
+		this.add(registerProject(this,pid,user, zt));
 		this.setVisible(true);
 	}
-	public JPanel registerProject(JFrame f,String pid,String user) {
+	public JPanel registerProject(JFrame f,String pid,String user,int zt) {
 		//RegisterNeedExpertData rnd = new RegisterNeedExpertData();
 		AllProjectData apd=new AllProjectData();
 		ArrayList<String> ls = apd.getProjectInfo(f, pid);
@@ -351,7 +351,7 @@ public class ShowResultFrame extends JFrame{
 				String need=projectNeedT.getText();
 				String contact=projectContactT.getText();
 				f.setEnabled(false);
-				new ShowRendomExpert(f,pid, name, work, meetdate,need,contact,user);
+				new ShowRendomExpert(f,pid, name, work, meetdate,need,contact,user,zt);
 			}
 		});
 		register.setBounds(550, 680, 80, 25);
