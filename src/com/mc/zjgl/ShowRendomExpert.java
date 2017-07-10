@@ -159,7 +159,7 @@ public class ShowRendomExpert extends JFrame {
 					expa[i][1]=fr.getValueAt(i, 2).toString();
 					expa[i][2]=fr.getValueAt(i, 3).toString();
 					expa[i][3]=fr.getValueAt(i, 6).toString();
-				    sqlex=sqlex+"update expertplan set selected="+b+",operator='"+user+"',operator='"+user+"' where projectid="+pid+" and bh="+fr.getValueAt(i, 0).toString()+";";
+				    sqlex=sqlex+"update expertplan set selected="+b+",operator='"+user+"' where projectid="+pid+" and bh="+fr.getValueAt(i, 0).toString()+";";
 				}
 				//sqlex=sqlex+"update expertneed set needstatus = 1,rendomdate='"+s+"' where projectid="+pid;
 				red.insertExpertPlan(sqlex);
